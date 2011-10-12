@@ -47,25 +47,25 @@ class SimpleWorker:
     url = self.url + 'projects/'+project_id+'?oauth=' + self.token
     return json.loads(self.__get(url))
 
-  def getWorkers(self, project_id = ''):
+  def getCodes(self, project_id = ''):
     if project_id == '':
       project_id = self.project_id
    
-    url = self.url + 'projects/'+project_id+'/workers?oauth=' + self.token
+    url = self.url + 'projects/'+project_id+'/codes?oauth=' + self.token
     ret = json.loads(self.__get(url))
-    return ret['workers']
+    return ret['codes']
      
-  def getWorkerDetails(self, worker_id):
+  def getCodeDetails(self, code_id):
     project_id = self.project_id
-    url = self.url + 'projects/'+project_id+'/workers/'+worker_id+'?oauth=' + self.token
-    print "getWorkerDetails, url = " + url
+    url = self.url + 'projects/'+project_id+'/codes/'+code_id+'?oauth=' + self.token
+    print "getCodeDetails, url = " + url
     return json.loads(self.__get(url))
  
-  def postWorker(self, project_id, name, runFilename, zipFilename):
+  def postCode(self, project_id, name, runFilename, zipFilename):
     if project_id == '':
       project_id = self.project_id
    
-    url = self.url + 'projects/'+project_id+'/workers?oauth=' + self.token
+    url = self.url + 'projects/'+project_id+'/codes?oauth=' + self.token
 
     register_openers()
     ts = time.asctime()

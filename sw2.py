@@ -1,8 +1,9 @@
 from simple_worker_pip import *
 import sys
 
-token = "your token here"
-host= "your host here"
+token = "jTxYQDmMx5ZtVeZBT8jVx6oJDLw"
+#token = "TSjcQAnNMZKWGdOyCJhxnN64CTk"
+host= "174.129.54.171"
 port = "8080"
 version = "2"
 
@@ -25,31 +26,31 @@ details = sw.getProjectDetails(project_id)
 
 print "details:  " + str(details)
 
-# Make a new worker:
+# Make a new code (drop): 
 
 name = "helloFromPython-" + str(time.time())
-print "creating worker with name:  " + name
-ret = sw.postWorker(project_id, name, "hello.py", "hello.zip")
+print "creating code (drop) with name:  " + name
+ret = sw.postCode(project_id, name, "hello.py", "hello.zip")
 time.sleep(1)
-print "postWorker returned:  " + str(ret)
+print "postCode returned:  " + str(ret)
 
-# For a given project_id, get list of workers:
+# For a given project_id, get list of Codes:
 
-workers = sw.getWorkers(project_id)
+codes = sw.getCodes(project_id)
 
-#print "workers:  " + str(workers)
-for worker in workers:
-  if worker['name'] == name:
-    print "newly created worker:  " + str(worker)
-    worker_id = worker['id']
+print "codes:  " + str(codes)
+for code in codes:
+  if code['name'] == name:
+    print "newly created coder:  " + str(code)
+    code_id = code['id']
 
-worker_id = workers[-1]['id']
-print "worker_id = " + worker_id
+code_id = codes[-1]['id']
+print "code_id = " + code_id
 #sys.exit()
 
-# get details for specific worker
-details = sw.getWorkerDetails(worker_id)
-print "worker details:  " + str(details)
+# get details for specific code (drop)
+details = sw.getCodeDetails(code_id)
+print "code details:  " + str(details)
 
 
 job_id = sw.postJob(project_id, name)
