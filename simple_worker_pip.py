@@ -101,11 +101,11 @@ class SimpleWorker:
     return project_id
      
     
-  def postJob(self, project_id, name):
+  def postTask(self, project_id, name):
     if project_id == '':
       project_id = self.project_id
-    url = self.url + 'projects/'+project_id+'/jobs?oauth=' + self.token
-    print "postJob url:  " + url
+    url = self.url + 'projects/'+project_id+'/tasks?oauth=' + self.token
+    print "postTask url:  " + url
     payload = [{"class_name" : name, "access_key" : name}]
     timestamp = time.asctime()
     data = {"payload" : payload, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name}
@@ -122,8 +122,8 @@ class SimpleWorker:
     task_id = msg['task_id']
     return task_id
 
-  def getLog(self, project_id, job_id):
-    url = self.url + 'projects/' + project_id + '/jobs/'+job_id+'/log/?oauth=' + self.token
+  def getLog(self, project_id, task_id):
+    url = self.url + 'projects/' + project_id + '/tasks/'+task_id+'/log/?oauth=' + self.token
     print "getLog url:  " + url
     del self.headers['Accept']
     del self.headers['Content-Type']

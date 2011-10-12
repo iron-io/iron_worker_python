@@ -53,12 +53,12 @@ details = sw.getCodeDetails(code_id)
 print "code details:  " + str(details)
 
 
-job_id = sw.postJob(project_id, name)
-print "postJob returned:  " + str(ret)
+task_id = sw.postTask(project_id, name)
+print "postTask returned:  " + str(ret)
 
-print "About to sleep 20 to let job run..."
+print "About to sleep 20 to let task run..."
 time.sleep(20)
 
-logstr = sw.getLog(project_id, job_id)
+logstr = sw.getLog(project_id, task_id)
 print "sw.getLog returns:  " + str(logstr)
 
