@@ -6,6 +6,7 @@ token = "jTxYQDmMx5ZtVeZBT8jVx6oJDLw"
 host= "174.129.54.171"
 port = "8080"
 version = "2"
+#mq_project_id = "4e25e1d25c0dd27801000275"
 
 sw = SimpleWorker(host, port, version, token)
 
@@ -54,11 +55,22 @@ print "code details:  " + str(details)
 
 
 task_id = sw.postTask(project_id, name)
-print "postTask returned:  " + str(ret)
+print "postTask returned:  " + str(task_id)
 
 print "About to sleep 20 to let task run..."
 time.sleep(20)
 
 logstr = sw.getLog(project_id, task_id)
 print "sw.getLog returns:  " + str(logstr)
+
+schedules = sw.getSchedules(project_id)
+print "getSchedules returns:  " + str(schedules)
+
+schedule_id = sw.postSchedule(project_id, name, 10)
+print "postTask returned:  " + str(schedule_id)
+
+print "About to sleep 30 to let schedule run..."
+time.sleep(30)
+
+
 

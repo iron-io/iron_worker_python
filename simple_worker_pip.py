@@ -1,11 +1,25 @@
 # SimpleWorker For Python
 import time
+from datetime import datetime
 import json
 import urllib2
 import urllib
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
+class RequestWithMethod(urllib2.Request):
+    """Workaround for using DELETE with urllib2"""
+    def __init__(self, url, method, data=None, headers={},\
+        origin_req_host=None, unverifiable=False):
+        self._method = method
+        urllib2.Request.__init__(self, url, data, headers,\
+                 origin_req_host, unverifiable)
+
+    def get_method(self):
+        if self._method:
+            return self._method
+        else:
+            return urllib2.Request.get_method(self) 
 
 class SimpleWorker:
   def __init__(self, host, port, version, token):
@@ -100,7 +114,74 @@ class SimpleWorker:
     project_id = msg['id']
     return project_id
      
+  
+  def deleteSchedule(self, project_id, schedule_id):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/schedules/'+schedule_id+'?oauth=' + self.token
+    print "deleteSchedule url:  " + url
+    req = RequestWithMethod(url, 'DELETE')
+    ret = urllib2.urlopen(req)
+    print "on deleteSchedule, urlopen returns:  " + str(ret)
+    s = ret.read()
+    print "body? " + str(s)
+    return true
+  
+  def getSchedules(self, project_id):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/schedules?oauth=' + self.token
+    print "getSchedules url:  " + url
+    self.headers = {}
+    self.headers['Accept'] = "application/json"
+    self.headers['Accept-Encoding'] = "gzip, deflate"
+    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    body = self.__get(url)
+    schedules = json.loads(body)
+    return schedules['schedules']
     
+  def postSchedule(self, project_id, name, delay):
+    # hash_to_send["payload"] = data
+    # hash_to_send["class_name"] = class_name
+    # hash_to_send["schedule"] = schedule - this is a hash too
+
+    #delay = delay + int(time.time() + 0.5)
+    #dt = datetime.fromtimestamp(delay + int(time.time()))
+    #delay = dt.isoformat()
+    #delay = time.asctime(time.gmtime(delay))
+    #delay = (time.time() + delay) * 1.0e9
+    #delay = (time.time() + delay)
+    #delay = int(delay)
+    print "delay = " + str(delay)
+    #delay = time.gmtime(delay)
+
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/schedules?oauth=' + self.token
+    print "postSchedule url:  " + url
+    timestamp = time.asctime()
+    schedule = {"delay" : delay, "project_id" : project_id}
+    payload = {"schedule" : schedule, "project_id" : project_id, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay}
+    options = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay}
+    data = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : options, "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay , "payload" : payload}
+
+    payload = [{"class_name" : name, "access_key" : name}]
+    data =  {"name" : name, "delay" : delay, "payload" : payload}
+    data = json.dumps(data)
+    print "data = " + data
+    dataLen = len(data)
+    headers = self.headers
+    headers['Content-Type'] = "application/json"
+    headers['Content-Length'] = str(dataLen)
+    headers['Accept'] = "application/json"
+    req = urllib2.Request(url, data, headers)
+    ret = urllib2.urlopen(req)
+    s = ret.read()
+    print "post schedules returns:  " + s
+    msg = json.loads(s)
+    schedule_id = msg['id']
+    return schedule_id
+
   def postTask(self, project_id, name):
     if project_id == '':
       project_id = self.project_id
