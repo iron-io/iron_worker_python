@@ -125,7 +125,8 @@ class SimpleWorker:
     print "on deleteSchedule, urlopen returns:  " + str(ret)
     s = ret.read()
     print "body? " + str(s)
-    return true
+    #return json.loads(s)
+    return
   
   def getSchedules(self, project_id):
     if project_id == '':
@@ -160,13 +161,18 @@ class SimpleWorker:
     url = self.url + 'projects/'+project_id+'/schedules?oauth=' + self.token
     print "postSchedule url:  " + url
     timestamp = time.asctime()
-    schedule = {"delay" : delay, "project_id" : project_id}
+    
+    #schedule = {"delay" : delay, "project_id" : project_id}
+    schedule = {"delay" : delay, "code_name" : name}
     payload = {"schedule" : schedule, "project_id" : project_id, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay}
     options = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay}
     data = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : options, "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay , "payload" : payload}
 
     payload = [{"class_name" : name, "access_key" : name}]
     data =  {"name" : name, "delay" : delay, "payload" : payload}
+    #data = json.dumps(data)
+    schedules = [schedule]
+    data = {"schedules" : schedules}
     data = json.dumps(data)
     print "data = " + data
     dataLen = len(data)

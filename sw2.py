@@ -57,8 +57,8 @@ print "code details:  " + str(details)
 task_id = sw.postTask(project_id, name)
 print "postTask returned:  " + str(task_id)
 
-print "About to sleep 20 to let task run..."
-time.sleep(20)
+print "About to sleep 30 to let task run..."
+time.sleep(30)
 
 logstr = sw.getLog(project_id, task_id)
 print "sw.getLog returns:  " + str(logstr)
@@ -66,11 +66,11 @@ print "sw.getLog returns:  " + str(logstr)
 schedules = sw.getSchedules(project_id)
 print "getSchedules returns:  " + str(schedules)
 
+
+for schedule in schedules:
+  print schedule['id']
+  sw.deleteSchedule(project_id, schedule['id'])
+
 schedule_id = sw.postSchedule(project_id, name, 10)
-print "postTask returned:  " + str(schedule_id)
-
-print "About to sleep 30 to let schedule run..."
-time.sleep(30)
-
-
+print "postSchedule returned:  " + str(schedule_id)
 
