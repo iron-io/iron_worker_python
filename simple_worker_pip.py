@@ -58,6 +58,11 @@ class SimpleWorker:
     if project_id == '':
       project_id = self.project_id
 
+    self.headers = {}
+    self.headers['Accept'] = "application/json"
+    self.headers['Accept-Encoding'] = "gzip, deflate"
+    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    
     url = self.url + 'projects/'+project_id+'?oauth=' + self.token
     return json.loads(self.__get(url))
 
@@ -83,7 +88,7 @@ class SimpleWorker:
 
     register_openers()
     ts = time.asctime()
-    data = json.dumps({"name":name,"standalone": True,"runtime":"python","file_name": runFilename,"version": self.version,"timestamp":ts,"oauth":self.token, "class_name" : name, "options" : {}, "access_key" : name})
+    data = json.dumps({"code_name" : name, "name":name,"standalone": True,"runtime":"python","file_name": runFilename,"version": self.version,"timestamp":ts,"oauth":self.token, "class_name" : name, "options" : {}, "access_key" : name})
 
     datagen, headers = multipart_encode({"file" : open(zipFilename, 'rb'), "data" : data})
 
@@ -114,7 +119,20 @@ class SimpleWorker:
     project_id = msg['id']
     return project_id
      
-  
+ 
+  def deleteProject(self, project_id):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'?oauth=' + self.token
+    print "deleteProject url:  " + url
+    req = RequestWithMethod(url, 'DELETE')
+    ret = urllib2.urlopen(req)
+    print "on deleteProject, urlopen returns:  " + str(ret)
+    s = ret.read()
+    print "body? " + str(s)
+    #return json.loads(s)
+    return
+ 
   def deleteSchedule(self, project_id, schedule_id):
     if project_id == '':
       project_id = self.project_id
@@ -193,10 +211,14 @@ class SimpleWorker:
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/tasks?oauth=' + self.token
     print "postTask url:  " + url
-    payload = [{"class_name" : name, "access_key" : name}]
+    payload = [{"class_name" : name, "access_key" : name, "code_name" : name}]
     timestamp = time.asctime()
-    data = {"payload" : payload, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name}
-    data = json.dumps(data)
+    data = {"code_name" : name, "payload" : payload, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name}
+    #task = {"code_name" : name, "payload" : payload, "priority" : 0, "timeout" : 3600}
+    task = {"code_name" : name, "payload" : payload}
+    tasks = {"tasks" : [task]}
+    data = json.dumps(tasks)
+    print "postJobs, data = " + data
     dataLen = len(data)
     headers = self.headers
     headers['Content-Type'] = "application/json"

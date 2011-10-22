@@ -10,14 +10,19 @@ version = "2"
 
 sw = SimpleWorker(host, port, version, token)
 
-projectName = "pip-gen-" + str(int(time.time()))
-newProject = sw.postProject(projectName)
-
 projects = sw.getProjects()
 
-print str(projects)
+print "getProjects returns:  " + str(projects)
 
-project_id = projects[0]['id']
+#for project in projects: 
+#  sw.deleteProject(project['id'])
+
+projectName = "pip-gen-project-" + str(int(time.time()))
+newProjectID = sw.postProject(projectName)
+
+print "newProjectID = " + str(newProjectID)
+
+project_id = newProjectID
 
 print "project_id = " + project_id
 
@@ -68,8 +73,9 @@ print "getSchedules returns:  " + str(schedules)
 
 
 for schedule in schedules:
-  print schedule['id']
-  sw.deleteSchedule(project_id, schedule['id'])
+  if schedule['status'] != 'cancelled':
+    print schedule['id']
+    sw.deleteSchedule(project_id, schedule['id'])
 
 schedule_id = sw.postSchedule(project_id, name, 10)
 print "postSchedule returned:  " + str(schedule_id)
