@@ -41,6 +41,19 @@ class SimpleWorker:
     ret = urllib2.urlopen(req)
     return ret.read() 
 
+  def getTasks(self, project_id = ''):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/tasks?oauth=' + self.token
+    self.headers = {}
+    self.headers['Accept'] = "application/json"
+    self.headers['Accept-Encoding'] = "gzip, deflate"
+    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    body = self.__get(url)
+    tasks = json.loads(body)
+    return tasks['tasks']
+    
+
   def getProjects(self):
     url = self.url + 'projects?oauth=' + self.token
     self.headers = {}
@@ -133,6 +146,31 @@ class SimpleWorker:
     #return json.loads(s)
     return
  
+  def deleteCode(self, project_id, code_id):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/codes/'+code_id+'?oauth=' + self.token
+    print "deleteCode url:  " + url
+    req = RequestWithMethod(url, 'DELETE')
+    ret = urllib2.urlopen(req)
+    print "on deleteCode, urlopen returns:  " + str(ret)
+    s = ret.read()
+    print "body? " + str(s)
+    return
+
+  def deleteTask(self, project_id, task_id):
+    if project_id == '':
+      project_id = self.project_id
+    url = self.url + 'projects/'+project_id+'/tasks/'+task_id+'?oauth=' + self.token
+    print "deleteTask url:  " + url
+    req = RequestWithMethod(url, 'DELETE')
+    ret = urllib2.urlopen(req)
+    print "on deleteTask, urlopen returns:  " + str(ret)
+    s = ret.read()
+    print "body? " + str(s)
+    #return json.loads(s)
+    return
+
   def deleteSchedule(self, project_id, schedule_id):
     if project_id == '':
       project_id = self.project_id
@@ -186,7 +224,7 @@ class SimpleWorker:
     options = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay}
     data = {"project_id" : project_id, "schedule" : schedule, "class_name" : name, "name" : name, "options" : options, "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name, "delay" : delay , "payload" : payload}
 
-    payload = [{"class_name" : name, "access_key" : name}]
+    payload = [{"class_name" : name, "access_key" : name, "name" : name}]
     data =  {"name" : name, "delay" : delay, "payload" : payload}
     #data = json.dumps(data)
     schedules = [schedule]
@@ -202,8 +240,10 @@ class SimpleWorker:
     ret = urllib2.urlopen(req)
     s = ret.read()
     print "post schedules returns:  " + s
+    # post schedules returns:  {"msg":"Scheduled","schedules":[{"id":"4ea35d11cddb1344fe00000c"}],"status_code":200}
+
     msg = json.loads(s)
-    schedule_id = msg['id']
+    schedule_id = msg['schedules'][0]['id']
     return schedule_id
 
   def postTask(self, project_id, name):
@@ -215,10 +255,11 @@ class SimpleWorker:
     timestamp = time.asctime()
     data = {"code_name" : name, "payload" : payload, "class_name" : name, "name" : name, "options" : "{}", "token" : self.token, "api_version" : self.version , "version" : self.version, "timestamp" : timestamp, "oauth" : self.token, "access_key" : name}
     #task = {"code_name" : name, "payload" : payload, "priority" : 0, "timeout" : 3600}
-    task = {"code_name" : name, "payload" : payload}
+    payload = json.dumps(payload)
+    task = {"name" : name, "code_name" : name, "payload" : payload}
     tasks = {"tasks" : [task]}
     data = json.dumps(tasks)
-    print "postJobs, data = " + data
+    print "postTasks, data = " + data
     dataLen = len(data)
     headers = self.headers
     headers['Content-Type'] = "application/json"
@@ -227,9 +268,11 @@ class SimpleWorker:
     req = urllib2.Request(url, data, headers)
     ret = urllib2.urlopen(req)
     s = ret.read()
-    msg = json.loads(s)
-    task_id = msg['task_id']
-    return task_id
+    print "postTasks returns:  " + s
+    # postTasks returns:  {"msg":"Queued up","status_code":200,"tasks":[{"id":"4ea35c4fcddb1344fe000007"}]}
+
+    ret = json.loads(s)
+    return ret
 
   def getLog(self, project_id, task_id):
     url = self.url + 'projects/' + project_id + '/tasks/'+task_id+'/log/?oauth=' + self.token
