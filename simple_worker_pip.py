@@ -84,7 +84,9 @@ class SimpleWorker:
       project_id = self.project_id
    
     url = self.url + 'projects/'+project_id+'/codes?oauth=' + self.token
-    ret = json.loads(self.__get(url))
+    body = self.__get(url)
+    print "getCodes body = " + body
+    ret = json.loads(body)
     return ret['codes']
      
   def getCodeDetails(self, code_id):
@@ -106,9 +108,14 @@ class SimpleWorker:
     datagen, headers = multipart_encode({"file" : open(zipFilename, 'rb'), "data" : data})
 
     headers = dict(headers.items() + self.headers.items())
+    print "postCode, headers = " + str(headers)
+    #print "postCode, datagen = " + str(datagen)
+    print "postCode, data = " + str(data)
     req = urllib2.Request(url, datagen, headers)
     ret = urllib2.urlopen(req)
-    return json.loads(ret.read())
+    body = ret.read()
+    print "postCode returns this body:  " + body
+    return json.loads(body)
 
   def postProject(self, name):
     url = self.url + 'projects?oauth=' + self.token
@@ -277,8 +284,12 @@ class SimpleWorker:
   def getLog(self, project_id, task_id):
     url = self.url + 'projects/' + project_id + '/tasks/'+task_id+'/log/?oauth=' + self.token
     print "getLog url:  " + url
-    del self.headers['Accept']
-    del self.headers['Content-Type']
-    del self.headers['Content-Length']
+    #del self.headers['Accept']
+    self.headers['Accept'] = "text/plain"
+    try:
+      del self.headers['Content-Type']
+      del self.headers['Content-Length']
+    except:
+      pass
     body = self.__get(url)
     return body 

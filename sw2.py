@@ -34,11 +34,20 @@ for project in projects:
       sw.deleteTask(project_id, task['id'])  
   
   codes = sw.getCodes(project_id)
+  # delete the first one, do another getCodes, make sure it's not there
+  try:
+    code_id = codes[0]['id']
+  except:
+    continue
+  sw.deleteCode(project_id, code_id)
+  codes = sw.getCodes(project_id)
   for code in codes:
+    if (code_id == code['id']):
+      print "Woop! I thought I deleted this code!  " + code_id
     print "deleting code:  " + code['id']
-    sw.deleteCode(project_id, code['id'])  
+    #sw.deleteCode(project_id, code['id'])  
 
-  sw.deleteProject(project['id'])
+  #sw.deleteProject(project['id'])
 
 projectName = "pip-gen-project-" + str(int(time.time()))
 newProjectID = sw.postProject(projectName)
@@ -60,12 +69,12 @@ print "details:  " + str(details)
 #name = "helloFromPython" + str(time.time())
 #name = "helloFromPython-" + str(time.time())
 s = ''.join(random.choice(string.ascii_uppercase) for x in range(10))
-name = "HEREhelloFromPython" + s
+name = "helloFromPython" + s
 print "creating code (drop) with name:  " + name
 ret = sw.postCode(project_id, name, "hello.py", "hello.zip")
 time.sleep(1)
 print "postCode returned:  " + str(ret)
-
+#sys.exit()
 # For a given project_id, get list of Codes:
 
 codes = sw.getCodes(project_id)
@@ -89,12 +98,21 @@ ret =  sw.postTask(project_id, name)
 print "postTask returned:  " + str(ret)
 task_id = ret['tasks'][0]['id']
 
+try: 
+  logstr = sw.getLog(project_id, task_id)
+except urllib2.HTTPError, e:
+  if e.code == 404:
+    print "Got expected 404 when attempting to get log right away..."
+  else:
+    print "Unexpected HTTP error:  " + str(e)
+    sys.exit()
+
 print "About to sleep 30 to let task run..."
 time.sleep(30)
 
 logstr = sw.getLog(project_id, task_id)
 print "sw.getLog returns:  " + str(logstr)
-
+sys.exit()
 schedules = sw.getSchedules(project_id)
 print "getSchedules returns:  " + str(schedules)
 
