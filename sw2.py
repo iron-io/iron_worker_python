@@ -2,13 +2,14 @@ from simple_worker_pip import *
 import sys
 import random
 import string
+import ConfigParser
 
-token = "jTxYQDmMx5ZtVeZBT8jVx6oJDLw"
-#token = "TSjcQAnNMZKWGdOyCJhxnN64CTk"
-host= "174.129.54.171"
-port = "8080"
-version = "2"
-#mq_project_id = "4e25e1d25c0dd27801000275"
+config = ConfigParser.RawConfigParser()
+config.read('config.ini')
+token    = config.get("IronWorker", "token")
+host     = config.get("IronWorker", "host" )
+port     = config.get("IronWorker", "port" )
+version  = config.get("IronWorker", "version")
 
 sw = SimpleWorker(host, port, version, token)
 
@@ -26,7 +27,8 @@ for project in projects:
       print "deleting schedule:  " + schedule['id']
       sw.deleteSchedule(project_id, schedule['id'])
 
-  tasks = sw.getTasks(project_id)
+  #tasks = sw.getTasks(project_id)
+  tasks = []
   print "tasks = " + str(tasks)
   for task in tasks:
     if task['status'] != 'cancelled':
@@ -39,7 +41,7 @@ for project in projects:
     code_id = codes[0]['id']
   except:
     continue
-  sw.deleteCode(project_id, code_id)
+  #sw.deleteCode(project_id, code_id)
   codes = sw.getCodes(project_id)
   for code in codes:
     if (code_id == code['id']):
