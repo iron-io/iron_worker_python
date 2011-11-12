@@ -3,8 +3,7 @@ simple_worker_pip
 SimpleWorker client for python
 
 TODO:
- * Config file for token, host, default project_id, etc.
- * Other API calls
+ * Scheduling Features
  * PIP installer
 
 
