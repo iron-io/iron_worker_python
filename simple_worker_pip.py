@@ -6,6 +6,7 @@ import urllib2
 import urllib
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
+import ssl
 
 class RequestWithMethod(urllib2.Request):
     """Workaround for using DELETE with urllib2"""
@@ -22,8 +23,8 @@ class RequestWithMethod(urllib2.Request):
             return urllib2.Request.get_method(self) 
 
 class SimpleWorker:
-  def __init__(self, host, port, version, token):
-    self.url = "http://"+host+":"+str(port) + "/"+str(version)+"/"
+  def __init__(self, host, port, version, token, protocol='http'):
+    self.url = protocol +"://"+host+":"+str(port) + "/"+str(version)+"/"
     print "url = " + self.url
     self.token = token
     self.version= version

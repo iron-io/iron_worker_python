@@ -3,6 +3,7 @@ import sys
 import random
 import string
 import ConfigParser
+import ssl
 
 config = ConfigParser.RawConfigParser()
 config.read('config.ini')
@@ -10,8 +11,9 @@ token    = config.get("IronWorker", "token")
 host     = config.get("IronWorker", "host" )
 port     = config.get("IronWorker", "port" )
 version  = config.get("IronWorker", "version")
+protocol  = config.get("IronWorker", "protocol")
 
-sw = SimpleWorker(host, port, version, token)
+sw = SimpleWorker(host, port, version, token, protocol)
 
 projects = sw.getProjects()
 
