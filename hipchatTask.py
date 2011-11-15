@@ -64,7 +64,7 @@ for k in kvz.keys():
     nNew = nNew + 1
     # We have not seen this one:
     msg = tmsgs[k]
-    cc.set(k,"1", 24*3600)
+    cc.set(k,"1", 48*3600)
     print "New message:  " 
     print json.dumps(msg, sort_keys = True, indent = 4)
    
