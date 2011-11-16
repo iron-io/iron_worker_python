@@ -1,9 +1,15 @@
 # SimpleWorker For Python
+import os
+import sys
 import time
 from datetime import datetime
 import json
 import urllib2
 import urllib
+p1 = sys.path
+p1 = p1[0]
+sys.path.append(p1+'/poster-0.4')
+print "path:  " + str(sys.path)
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import ssl
