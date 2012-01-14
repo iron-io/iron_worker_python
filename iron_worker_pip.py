@@ -40,7 +40,7 @@ class IronWorker:
     DEFAULT_HOST = "worker-aws-us-east-1.iron.io"
     USER_AGENT = "IronWorker Python Pip v0.3"
 
-    def __init__(self, token, project_id='', host=DEFAULT_HOST, port=80,
+    def __init__(self, token, project_id=None, host=DEFAULT_HOST, port=80,
             version=2, protocol='http'):
         self.url = "%s://%s:%s/%s/" % (protocol, host, port, version)
         print "url = " + self.url
@@ -60,8 +60,8 @@ class IronWorker:
         ret = urllib2.urlopen(req)
         return ret.read()
 
-    def getTasks(self, project_id=''):
-        if project_id == '':
+    def getTasks(self, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
                 self.token)
@@ -99,8 +99,8 @@ class IronWorker:
     def setProject(self, project_id):
         self.project_id = project_id
 
-    def getProjectDetails(self, project_id=''):
-        if project_id == '':
+    def getProjectDetails(self, project_id=None):
+        if project_id is None:
             project_id = self.project_id
 
         self.headers = {}
@@ -111,8 +111,8 @@ class IronWorker:
         url = "%sprojects/%s?oauth=%s" % (self.url, project_id, self.token)
         return json.loads(self.__get(url))
 
-    def getCodes(self, project_id=''):
-        if project_id == '':
+    def getCodes(self, project_id=None):
+        if project_id is None:
             project_id = self.project_id
 
         url = "%sprojects/%s/codes?oauth=%s" % (self.url, project_id,
@@ -129,8 +129,8 @@ class IronWorker:
         print "getCodeDetails, url = " + url
         return json.loads(self.__get(url))
 
-    def postCode(self, name, runFilename, zipFilename, project_id=''):
-        if project_id == '':
+    def postCode(self, name, runFilename, zipFilename, project_id=None):
+        if project_id is None:
             project_id = self.project_id
 
         url = "%sprojects/%s/codes?oauth=%s" % (self.url, project_id,
@@ -190,8 +190,8 @@ class IronWorker:
         project_id = msg['id']
         return project_id
 
-    def deleteProject(self, project_id=''):
-        if project_id == '':
+    def deleteProject(self, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s?oauth%s" % (self.url, project_id, self.token)
         print "deleteProject url:  " + url
@@ -202,8 +202,8 @@ class IronWorker:
         print "body? " + str(s)
         return
 
-    def deleteCode(self, code_id, project_id=''):
-        if project_id == '':
+    def deleteCode(self, code_id, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/codes/%s?oauth=%s" % (self.url, project_id,
                 code_id, self.token)
@@ -215,8 +215,8 @@ class IronWorker:
         print "body? " + str(s)
         return
 
-    def deleteTask(self, task_id, project_id=''):
-        if project_id == '':
+    def deleteTask(self, task_id, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
@@ -228,8 +228,8 @@ class IronWorker:
         print "body? " + str(s)
         return
 
-    def deleteSchedule(self, schedule_id, project_id=''):
-        if project_id == '':
+    def deleteSchedule(self, schedule_id, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules/%s?oauth=%s" % (self.url, project_id,
                 schedule_id, self.token)
@@ -241,8 +241,8 @@ class IronWorker:
         print "body? " + str(s)
         return
 
-    def getSchedules(self, project_id=''):
-        if project_id == '':
+    def getSchedules(self, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
                 self.token)
@@ -255,10 +255,10 @@ class IronWorker:
         schedules = json.loads(body)
         return schedules['schedules']
 
-    def postSchedule(self, name, delay, project_id=''):
+    def postSchedule(self, name, delay, project_id=None):
         print "delay = " + str(delay)
 
-        if project_id == '':
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
                 self.token)
@@ -315,8 +315,8 @@ class IronWorker:
         schedule_id = msg['schedules'][0]['id']
         return schedule_id
 
-    def postTask(self, name, payload={}, project_id=''):
-        if project_id == '':
+    def postTask(self, name, payload={}, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
                 self.token)
@@ -365,8 +365,8 @@ class IronWorker:
         ret = json.loads(s)
         return ret
 
-    def getLog(self, task_id, project_id=''):
-        if project_id == '':
+    def getLog(self, task_id, project_id=None):
+        if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s/log?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
