@@ -1,4 +1,4 @@
-# SimpleWorker For Python
+# IronWorker For Python
 import os
 import sys
 import time
@@ -28,17 +28,20 @@ class RequestWithMethod(urllib2.Request):
         else:
             return urllib2.Request.get_method(self) 
 
-class SimpleWorker:
-  def __init__(self, host, port, version, token, protocol='http'):
+class IronWorker:
+  DEFAULT_HOST = "worker-aws-us-east-1.iron.io"
+  USER_AGENT = "IronWorker Python Pip v0.3"
+
+  def __init__(self, token, project_id='', host=DEFAULT_HOST, port=80, version=2, protocol='http'):
     self.url = protocol +"://"+host+":"+str(port) + "/"+str(version)+"/"
     print "url = " + self.url
     self.token = token
     self.version= version
-    self.project_id = ''
+    self.project_id = project_id
     self.headers = {}
     self.headers['Accept'] = "application/json"
     self.headers['Accept-Encoding'] = "gzip, deflate"
-    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    self.headers['User-Agent'] = USER_AGENT
 
   def __get(self, url, headers = {}):
     headers = dict(headers.items() + self.headers.items())
@@ -55,7 +58,7 @@ class SimpleWorker:
     self.headers = {}
     self.headers['Accept'] = "application/json"
     self.headers['Accept-Encoding'] = "gzip, deflate"
-    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    self.headers['User-Agent'] = USER_AGENT
     body = self.__get(url)
     tasks = json.loads(body)
     return tasks['tasks']
@@ -66,7 +69,7 @@ class SimpleWorker:
     self.headers = {}
     self.headers['Accept'] = "application/json"
     self.headers['Accept-Encoding'] = "gzip, deflate"
-    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    self.headers['User-Agent'] = USER_AGENT
     body = self.__get(url)
     projects = json.loads(body)
     return projects['projects']
@@ -81,7 +84,7 @@ class SimpleWorker:
     self.headers = {}
     self.headers['Accept'] = "application/json"
     self.headers['Accept-Encoding'] = "gzip, deflate"
-    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    self.headers['User-Agent'] = USER_AGENT
     
     url = self.url + 'projects/'+project_id+'?oauth=' + self.token
     return json.loads(self.__get(url))
@@ -102,7 +105,7 @@ class SimpleWorker:
     print "getCodeDetails, url = " + url
     return json.loads(self.__get(url))
  
-  def postCode(self, project_id, name, runFilename, zipFilename):
+  def postCode(self, name, runFilename, zipFilename, project_id=''):
     if project_id == '':
       project_id = self.project_id
    
@@ -116,7 +119,6 @@ class SimpleWorker:
 
     headers = dict(headers.items() + self.headers.items())
     print "postCode, headers = " + str(headers)
-    #print "postCode, datagen = " + str(datagen)
     print "postCode, data = " + str(data)
     req = urllib2.Request(url, datagen, headers)
     ret = urllib2.urlopen(req)
@@ -147,7 +149,7 @@ class SimpleWorker:
     return project_id
      
  
-  def deleteProject(self, project_id):
+  def deleteProject(self, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'?oauth=' + self.token
@@ -160,7 +162,7 @@ class SimpleWorker:
     #return json.loads(s)
     return
  
-  def deleteCode(self, project_id, code_id):
+  def deleteCode(self, code_id, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/codes/'+code_id+'?oauth=' + self.token
@@ -172,7 +174,7 @@ class SimpleWorker:
     print "body? " + str(s)
     return
 
-  def deleteTask(self, project_id, task_id):
+  def deleteTask(self, task_id, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/tasks/'+task_id+'?oauth=' + self.token
@@ -185,7 +187,7 @@ class SimpleWorker:
     #return json.loads(s)
     return
 
-  def deleteSchedule(self, project_id, schedule_id):
+  def deleteSchedule(self, schedule_id, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/schedules/'+schedule_id+'?oauth=' + self.token
@@ -198,7 +200,7 @@ class SimpleWorker:
     #return json.loads(s)
     return
   
-  def getSchedules(self, project_id):
+  def getSchedules(self, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/schedules?oauth=' + self.token
@@ -206,12 +208,12 @@ class SimpleWorker:
     self.headers = {}
     self.headers['Accept'] = "application/json"
     self.headers['Accept-Encoding'] = "gzip, deflate"
-    self.headers['User-Agent'] = "SimpleWorker Python Pip v0.3"
+    self.headers['User-Agent'] = USER_AGENT
     body = self.__get(url)
     schedules = json.loads(body)
     return schedules['schedules']
     
-  def postSchedule(self, project_id, name, delay):
+  def postSchedule(self, name, delay, project_id=''):
     # hash_to_send["payload"] = data
     # hash_to_send["class_name"] = class_name
     # hash_to_send["schedule"] = schedule - this is a hash too
@@ -260,7 +262,7 @@ class SimpleWorker:
     schedule_id = msg['schedules'][0]['id']
     return schedule_id
 
-  def postTask(self, project_id, name):
+  def postTask(self, name, project_id=''):
     if project_id == '':
       project_id = self.project_id
     url = self.url + 'projects/'+project_id+'/tasks?oauth=' + self.token
@@ -288,7 +290,7 @@ class SimpleWorker:
     ret = json.loads(s)
     return ret
 
-  def getLog(self, project_id, task_id):
+  def getLog(self, task_id, project_id=''):
     url = self.url + 'projects/' + project_id + '/tasks/'+task_id+'/log/?oauth=' + self.token
     print "getLog url:  " + url
     #del self.headers['Accept']

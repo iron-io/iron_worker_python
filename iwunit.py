@@ -1,11 +1,11 @@
-from simple_worker_pip import *
+from iron_worker_pip import *
 import unittest
 import sys
 import random
 import string
 import ConfigParser
 
-class TestSimpleWorkerPip(unittest.TestCase):
+class TestIronWorkerPip(unittest.TestCase):
   
   def setUp(self):
     config = ConfigParser.RawConfigParser()
@@ -15,13 +15,13 @@ class TestSimpleWorkerPip(unittest.TestCase):
     self.port = config.get("IronWorker", "port")
     self.version = config.get("IronWorker", "version")
 
-    self.sw = SimpleWorker(self.host, self.port, self.version, self.token)
+    self.worker = IronWorker(self.token, self.host, self.port, self.version)
 
   def test_create_project(self):
     projectName = "pip-gen-project-" + str(int(time.time()))
-    newProjectID = self.sw.postProject(projectName)
+    newProjectID = self.worker.postProject(projectName)
 
-    projects = self.sw.getProjects()
+    projects = self.worker.getProjects()
 
     project_names = []
     for project in projects: 
@@ -33,12 +33,12 @@ class TestSimpleWorkerPip(unittest.TestCase):
   def test_delete_project(self):
     return
     projectName = "pip-gen-project-" + str(int(time.time()))
-    newProjectID = self.sw.postProject(projectName)
+    newProjectID = self.worker.postProject(projectName)
 
-    projects = self.sw.getProjects()
-    self.sw.deleteProject(projects[0]['id'])
+    projects = self.worker.getProjects()
+    self.worker.deleteProject(projects[0]['id'])
 
-    projects = self.sw.getProjects()
+    projects = self.worker.getProjects()
     project_names = []
     for project in projects: 
       project_names.append(project['name'])
