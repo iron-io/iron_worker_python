@@ -43,32 +43,29 @@ class IronWorker:
     def __init__(self, token, project_id=None, host=DEFAULT_HOST, port=80,
             version=2, protocol='http'):
         self.url = "%s://%s:%s/%s/" % (protocol, host, port, version)
-        print "url = " + self.url
         self.token = token
         self.version = version
         self.project_id = project_id
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
+        self.__setCommonHeaders()
 
     def __get(self, url, headers={}):
         headers = dict(headers.items() + self.headers.items())
-        print "__get, url = " + url
-        print "__get , headers = " + str(headers)
         req = urllib2.Request(url, None, headers)
         ret = urllib2.urlopen(req)
         return ret.read()
+
+    def __setCommonHeaders(self):
+        self.headers = {
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip, deflate",
+            "User-Agent": "IronWorker Python Pip v0.3"
+        }
 
     def getTasks(self, project_id=None):
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
                 self.token)
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
         body = self.__get(url)
         tasks = json.loads(body)
         return tasks['tasks']
@@ -78,20 +75,12 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
         body = self.__get(url)
         task = json.loads(body)
         return task
 
     def getProjects(self):
         url = self.url + 'projects?oauth=' + self.token
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
         body = self.__get(url)
         projects = json.loads(body)
         return projects['projects']
@@ -103,11 +92,6 @@ class IronWorker:
         if project_id is None:
             project_id = self.project_id
 
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
-
         url = "%sprojects/%s?oauth=%s" % (self.url, project_id, self.token)
         return json.loads(self.__get(url))
 
@@ -118,7 +102,6 @@ class IronWorker:
         url = "%sprojects/%s/codes?oauth=%s" % (self.url, project_id,
                 self.token)
         body = self.__get(url)
-        print "getCodes body = " + body
         ret = json.loads(body)
         return ret['codes']
 
@@ -126,7 +109,6 @@ class IronWorker:
         project_id = self.project_id
         url = "%sprojects/%s/codes/%s?oauth=%s" % (self.url, project_id,
                 code_id, self.token)
-        print "getCodeDetails, url = " + url
         return json.loads(self.__get(url))
 
     def postCode(self, name, runFilename, zipFilename, project_id=None):
@@ -158,12 +140,9 @@ class IronWorker:
         })
 
         headers = dict(headers.items() + self.headers.items())
-        print "postCode, headers = " + str(headers)
-        print "postCode, data = " + str(data)
         req = urllib2.Request(url, datagen, headers)
         ret = urllib2.urlopen(req)
         body = ret.read()
-        print "postCode returns this body:  " + body
         return json.loads(body)
 
     def postProject(self, name):
@@ -185,7 +164,6 @@ class IronWorker:
         req = urllib2.Request(url, data, headers)
         ret = urllib2.urlopen(req)
         s = ret.read()
-        print "postProject returns:  " + s
         msg = json.loads(s)
         project_id = msg['id']
         return project_id
@@ -194,12 +172,9 @@ class IronWorker:
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s?oauth%s" % (self.url, project_id, self.token)
-        print "deleteProject url:  " + url
         req = RequestWithMethod(url, 'DELETE')
         ret = urllib2.urlopen(req)
-        print "on deleteProject, urlopen returns:  " + str(ret)
         s = ret.read()
-        print "body? " + str(s)
         return
 
     def deleteCode(self, code_id, project_id=None):
@@ -207,12 +182,9 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/codes/%s?oauth=%s" % (self.url, project_id,
                 code_id, self.token)
-        print "deleteCode url:  " + url
         req = RequestWithMethod(url, 'DELETE')
         ret = urllib2.urlopen(req)
-        print "on deleteCode, urlopen returns:  " + str(ret)
         s = ret.read()
-        print "body? " + str(s)
         return
 
     def deleteTask(self, task_id, project_id=None):
@@ -220,12 +192,9 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
-        print "deleteTask url:  " + url
         req = RequestWithMethod(url, 'DELETE')
         ret = urllib2.urlopen(req)
-        print "on deleteTask, urlopen returns:  " + str(ret)
         s = ret.read()
-        print "body? " + str(s)
         return
 
     def deleteSchedule(self, schedule_id, project_id=None):
@@ -233,12 +202,9 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/schedules/%s?oauth=%s" % (self.url, project_id,
                 schedule_id, self.token)
-        print "deleteSchedule url:  " + url
         req = RequestWithMethod(url, 'DELETE')
         ret = urllib2.urlopen(req)
-        print "on deleteSchedule, urlopen returns:  " + str(ret)
         s = ret.read()
-        print "body? " + str(s)
         return
 
     def getSchedules(self, project_id=None):
@@ -246,23 +212,15 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
                 self.token)
-        print "getSchedules url:  " + url
-        self.headers = {}
-        self.headers['Accept'] = "application/json"
-        self.headers['Accept-Encoding'] = "gzip, deflate"
-        self.headers['User-Agent'] = self.USER_AGENT
         body = self.__get(url)
         schedules = json.loads(body)
         return schedules['schedules']
 
     def postSchedule(self, name, delay, project_id=None):
-        print "delay = " + str(delay)
-
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
                 self.token)
-        print "postSchedule url:  " + url
         timestamp = time.asctime()
 
         schedules = [{"delay": delay, "code_name": name}]
@@ -297,19 +255,13 @@ class IronWorker:
 
         data = {"schedules": schedules}
         data = json.dumps(data)
-        print "data = " + data
         dataLen = len(data)
         headers = self.headers
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
-        headers['Accept'] = "application/json"
         req = urllib2.Request(url, data, headers)
         ret = urllib2.urlopen(req)
         s = ret.read()
-        print "post schedules returns:  " + s
-        # post schedules returns
-        # {"msg":"Scheduled","schedules":[{"id":"4ea35d11cddb1344fe00000c"}],
-        #     "status_code":200}
 
         msg = json.loads(s)
         schedule_id = msg['schedules'][0]['id']
@@ -320,12 +272,6 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
                 self.token)
-        print "postTask url:  " + url
-        #payload = [{
-        #    "class_name": name,
-        #    "access_key": name,
-        #    "code_name": name
-        #}]
         timestamp = time.asctime()
         data = {
             "code_name": name,
@@ -348,7 +294,6 @@ class IronWorker:
         }
         tasks = {"tasks": [task]}
         data = json.dumps(tasks)
-        print "postTasks, data = " + data
         dataLen = len(data)
         headers = self.headers
         headers['Content-Type'] = "application/json"
@@ -357,10 +302,6 @@ class IronWorker:
         req = urllib2.Request(url, data, headers)
         ret = urllib2.urlopen(req)
         s = ret.read()
-        print "postTasks returns:  " + s
-        # postTasks returns:
-        # {"msg":"Queued up","status_code":200,
-        #     "tasks":[{"id":"4ea35c4fcddb1344fe000007"}]}
 
         ret = json.loads(s)
         return ret
@@ -370,7 +311,6 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s/log?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
-        print "getLog url:  " + url
         self.headers['Accept'] = "text/plain"
         try:
             del self.headers['Content-Type']
