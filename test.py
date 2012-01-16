@@ -1,21 +1,31 @@
 from iron_worker_pip import *
 import unittest
 import ConfigParser
+import time
+
 
 class TestIronWorkerPip(unittest.TestCase):
-    
+
     def setUp(self):
         config = ConfigParser.RawConfigParser()
         config.read('config.ini')
         self.token = config.get("IronWorker", "token")
-        self.host= config.get("IronWorker", "host")
+        self.host = config.get("IronWorker", "host")
         self.port = config.get("IronWorker", "port")
         self.version = config.get("IronWorker", "version")
         self.project_id = config.get("IronWorker", "project_id")
         self.new_project_id = "New Project Id"
 
+        self.code_name = "test%d" % time.time()
+
         self.worker = IronWorker(token=self.token, host=self.host,
             port=self.port, version=self.version, project_id=self.project_id)
+
+        IronWorker.createZip(destination="test.zip", files=["test.py"],
+                overwrite=True)
+        response = self.worker.postCode(name=self.code_name,
+                runFilename="test.py", zipFilename="test.zip")
+
 
     def test_setProject(self):
         self.assertNotEqual(self.worker.project_id, self.new_project_id)
@@ -33,25 +43,24 @@ class TestIronWorkerPip(unittest.TestCase):
         self.assertEqual(self.worker.headers['User-Agent'],
                 "IronWorker Python Pip v0.3")
 
-
     def test_postCode(self):
         IronWorker.createZip(destination="test.zip", files=["test.py"],
                 overwrite=True)
-        response = self.worker.postCode(name="test", runFilename="test.py",
-                zipFilename="test.zip")
+        response = self.worker.postCode(name=self.code_name,
+                runFilename="test.py", zipFilename="test.zip")
         self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
         code_names = []
         for code in codes:
             code_names.append(code["name"])
-        self.assertIn("test", code_names)
+        self.assertIn(self.code_name, code_names)
 
     def test_getCodeDetails(self):
         IronWorker.createZip(destination="test.zip", files=["test.py"],
                 overwrite=True)
-        response = self.worker.postCode(name="test", runFilename="test.py",
-                zipFilename="test.zip")
+        response = self.worker.postCode(name=self.code_name,
+                runFilename="test.py", zipFilename="test.zip")
         self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
@@ -61,11 +70,11 @@ class TestIronWorkerPip(unittest.TestCase):
 
     def test_postTask(self):
         payload = {
-                "dict": {"a":1, "b":2},
+                "dict": {"a": 1, "b": 2},
                 "var": "alpha",
                 "list": ['apples', 'oranges', 'bananas']
         }
-        resp = self.worker.postTask(name="test", payload=payload)
+        resp = self.worker.postTask(name=self.code_name, payload=payload)
 
         self.assertEqual(resp['status_code'], 200)
         self.assertEqual(len(resp['tasks']), 1)
@@ -76,16 +85,16 @@ class TestIronWorkerPip(unittest.TestCase):
         task_ids = []
         for task in tasks:
             task_ids.append(task['id'])
-        
+
         self.assertIn(task_id, task_ids)
 
     def test_getTaskDetails(self):
         payload = {
-                "dict": {"a":1, "b":2},
+                "dict": {"a": 1, "b": 2},
                 "var": "alpha",
                 "list": ['apples', 'oranges', 'bananas']
         }
-        resp = self.worker.postTask(name="test", payload=payload)
+        resp = self.worker.postTask(name=self.code_name, payload=payload)
 
         self.assertEqual(resp['status_code'], 200)
         self.assertEqual(len(resp['tasks']), 1)
@@ -96,7 +105,7 @@ class TestIronWorkerPip(unittest.TestCase):
         task_ids = []
         for task in tasks:
             task_ids.append(task['id'])
-        
+
         self.assertIn(task_id, task_ids)
 
         tasks = self.worker.getTasks()
@@ -108,7 +117,7 @@ class TestIronWorkerPip(unittest.TestCase):
 
     def test_deleteTask(self):
         tasks = self.worker.getTasks()
-        
+
         for task in tasks:
             self.worker.deleteTask(task_id=task['id'])
 
@@ -120,7 +129,7 @@ class TestIronWorkerPip(unittest.TestCase):
         self.assertEqual(len(real_tasks), 0)
 
     def test_postSchedule(self):
-        schedule_id = self.worker.postSchedule(name="test", delay=120)
+        schedule_id = self.worker.postSchedule(name=self.code_name, delay=120)
 
         schedules = self.worker.getSchedules()
         schedule_ids = []
