@@ -29,7 +29,7 @@ class RequestWithMethod(urllib2.Request):
     def __init__(self, url, method, data=None, headers={},
             origin_req_host=None, unverifiable=False):
         self._method = method
-        urllib2.Request.__init__(self, url, data, headers,
+        return urllib2.Request.__init__(self, url, data, headers,
                 origin_req_host, unverifiable)
 
     def get_method(self):
@@ -90,6 +90,7 @@ class IronWorker:
         project_id -- The project ID to get tasks from. Defaults to the
                       project ID set when initialising the wrapper.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
@@ -107,6 +108,7 @@ class IronWorker:
         project_id -- The ID of the project the task belongs to. Defaults to
                       the project ID set when initialising the wrapper.
         """
+        self.__setCommonHeaders()
         if project_id == "":
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
@@ -117,7 +119,9 @@ class IronWorker:
 
     def getProjects(self):
         """Execute an HTTP request to get a list of projects and return it."""
-        url = self.url + 'projects?oauth=' + self.token
+        self.__setCommonHeaders()
+        url = "%sprojects?oauth=%s" % (self.url, self.token)
+        self.__setCommonHeaders()
         body = self.__get(url)
         projects = json.loads(body)
         return projects['projects']
@@ -138,6 +142,7 @@ class IronWorker:
         project_id -- The ID of the project to get details on. Defaults to the
                       project ID set when initialising the wrapper.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
 
@@ -153,6 +158,7 @@ class IronWorker:
                       fetched. Defaults to the project ID set when initialising
                       the wrapper.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
 
@@ -169,6 +175,7 @@ class IronWorker:
         Keyword arguments:
         code_id -- The ID of the code package to fetch details on. (Required)
         """
+        self.__setCommonHeaders()
         project_id = self.project_id
         url = "%sprojects/%s/codes/%s?oauth=%s" % (self.url, project_id,
                 code_id, self.token)
@@ -228,7 +235,8 @@ class IronWorker:
         Keyword arguments:
         name -- The name of the new project. (Required)
         """
-        url = "%sprojects?oauth=%s" (self.url, self.token)
+        self.__setCommonHeaders()
+        url = "%sprojects?oauth=%s" % (self.url, self.token)
         payload = [{
             "name": name,
             "class_name": name,
@@ -248,22 +256,8 @@ class IronWorker:
         s = ret.read()
         msg = json.loads(s)
         project_id = msg['id']
+        self.__setCommonHeaders()
         return project_id
-
-    def deleteProject(self, project_id=None):
-        """Execute an HTTP request to delete a project.
-
-        Keyword arguments:
-        project_id -- The project to be deleted. Defaults to the project ID
-                      set when initialising the wrapper.
-        """
-        if project_id is None:
-            project_id = self.project_id
-        url = "%sprojects/%s?oauth%s" % (self.url, project_id, self.token)
-        req = RequestWithMethod(url, 'DELETE')
-        ret = urllib2.urlopen(req)
-        s = ret.read()
-        return
 
     def deleteCode(self, code_id, project_id=None):
         """Execute an HTTP request to delete a code package.
@@ -274,6 +268,7 @@ class IronWorker:
                       Defaults to the project ID set when initialising the
                       wrapper.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/codes/%s?oauth=%s" % (self.url, project_id,
@@ -291,6 +286,7 @@ class IronWorker:
         project_id -- The ID of the project that contains the task. Defaults
                       to the project_id set when the wrapper was initialised.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
@@ -309,6 +305,7 @@ class IronWorker:
                       Defaults to the project_id set when the wrapper was
                       intialised.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules/%s?oauth=%s" % (self.url, project_id,
@@ -327,6 +324,7 @@ class IronWorker:
                       retrieved. Defaults to the project ID set when the
                       wrapper was initialised.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
@@ -341,13 +339,15 @@ class IronWorker:
         executed later.
 
         Keyword arguments:
-        name -- A name for the scheduled task. (Required)
+        name -- A name for the worker that will execute the scheduled
+                task. (Required)
         delay -- The number of seconds to delay execution for. (Required)
         project_id -- The ID of the project to schedule the task under.
                       Defaults to the project ID set when the wrapper was
                       initialised.
         """
 
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
@@ -356,7 +356,7 @@ class IronWorker:
 
         schedules = [{"delay": delay, "code_name": name}]
         payload = [{
-            "schedule": schedule,
+            "schedule": schedules[0],
             "project_id": project_id,
             "class_name": name,
             "name": name,
@@ -371,7 +371,7 @@ class IronWorker:
         }]
         options = {
             "project_id": project_id,
-            "schedule": schedule,
+            "schedule": schedules[0],
             "class_name": name,
             "name": name,
             "options": {},
@@ -396,6 +396,7 @@ class IronWorker:
 
         msg = json.loads(s)
         schedule_id = msg['schedules'][0]['id']
+        self.__setCommonHeaders()
         return schedule_id
 
     def postTask(self, name, payload={}, project_id=None):
@@ -403,12 +404,13 @@ class IronWorker:
         the worker.
 
         Keyword arguments:
-        name -- The name of the task. (Required)
+        name -- The name of the code package to execute against. (Required)
         payload -- Arguments to be passed to the task. Defaults to {}.
         project_id -- The ID of the project the task is to be created under.
                       Defaults to the project ID set when the wrapper was
                       initialised.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
@@ -456,6 +458,7 @@ class IronWorker:
                       being retrieved. Defaults to the project ID set when the
                       wrapper was initialised.
         """
+        self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
         url = "%sprojects/%s/tasks/%s/log?oauth=%s" % (self.url, project_id,
