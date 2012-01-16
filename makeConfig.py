@@ -6,7 +6,7 @@ config['IronWorker'] = {"token" : "YOUR_TOKEN_HERE",
                         "host"  : "worker-aws-us-east-1.iron.io",
                         "port"  : "80",
                         "version" : "2",
-                        "defaultProjectId" : "YOUR_PROJECT_ID"}
+                        "project_id" : "YOUR_PROJECT_ID"}
 
 config['CloudCache'] = {"token" : "YOUR_TOKEN_HERE",
                         "host"  : "174.129.12.177",
@@ -26,5 +26,3 @@ for section in config.keys():
 
 with open('config_example.ini', 'w') as configfile:
   cnf.write(configfile)
-
-       

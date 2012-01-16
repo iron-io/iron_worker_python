@@ -5,7 +5,7 @@ import cloudcache
 import ConfigParser
 import os
 import sys
-from simple_worker_pip import *
+from iron_worker_pip import *
 
 try:
   dr = sys.argv[2]
@@ -22,19 +22,16 @@ host     = config.get("IronWorker", "host"   )
 port     = config.get("IronWorker", "port"   )
 version  = config.get("IronWorker", "version")
 protocol = config.get("IronWorker", "protocol")
-project_id = config.get("IronWorker", "defaultProjectId")
-sw = SimpleWorker(host, port, version, token, protocol)
+project_id = config.get("IronWorker", "project_id")
+worker = IronWorker(token=token, host=host, port=port, version=version, protocol=protocol, project_id=project_id)
 
 name = "NestedTask-B-" + str(time.time())
 
 zfn = dr + "hello.zip"
-ret = sw.postCode(project_id, name, "hello.py", zfn)
+ret = worker.postCode(name=name, runFilename="hello.py", zipFilename=zfn)
 
-ret =  sw.postTask(project_id, name)
+ret =  worker.postTask(name=name)
 print "postTask returned:  " + str(ret)
 task_id = ret['tasks'][0]['id']
 
 print "Nested task creation returns:  " + str(task_id)
-
-
-
