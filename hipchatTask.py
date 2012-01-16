@@ -70,8 +70,3 @@ for k in kvz.keys():
    
 if nNew == 0:
   print "No new messages." 
-    
-
-  
-
-

@@ -1,4 +1,4 @@
-# SimpleWorker For Python
+# IronWorker For Python
 import time
 from datetime import datetime
 import json
@@ -27,15 +27,16 @@ import hashlib
 #
 
 class CloudCache:
-  def __init__(self, host, port, version, akey, skey):
+  def __init__(self, host, port=80, version, akey, skey, protocol="http", project_id=''):
     #self.url = "http://"+host+":"+str(port) + "/"+str(version)+"/"
-    self.url = "http://"+host+":"+str(port) + "/"
+    self.url = "%s://%s:%s/" % (protocol, host, port)
     #print "url = " + self.url
     self.host = host
     self.port = port
     self.akey = akey
     self.skey = skey
     self.version= version
+    self.protocol = protocol
     self.project_id = ''
     self.headers = {}
     self.headers['Accept'] = "application/json"
@@ -64,11 +65,11 @@ class CloudCache:
 
   def auth(self):
     ts = self.__generate_timestamp(time.gmtime())
-    sig = self.__generate_signature("CloudCache", "auth", ts, self.skey)
+    sig = self.__generate_signature(service="CloudCache", operation="auth", timestamp=ts, secret_access_key=self.skey)
   
-    url = "http://" + self.host + ":" + self.port + "/auth"
+    url = "%s://%s:%s/auth" % (self.protocol, self.hot, self.port)
     
-    headers = {'User-Agent' : "CloudCache Pip version 0.4", 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
+    headers = {'User-Agent' : self.headers['User-Agent'], 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
 
     req = urllib2.Request(url, None, headers)
     ret = urllib2.urlopen(req)
@@ -76,12 +77,12 @@ class CloudCache:
 
   def getmulti(self, keys):
     ts = self.__generate_timestamp(time.gmtime())
-    sig = self.__generate_signature("CloudCache", "multi", ts, self.skey)
+    sig = self.__generate_signature(service="CloudCache", operation="multi", timestamp=ts, secret_access_key=self.skey)
   
-    url = "http://" + self.host + ":" + self.port + "/getmulti"
+    url = "%s://%s:%s/getmulti" % (self.protocol, self.host, self.port)
     #print "getmulti url = " + url
     
-    headers = {'User-Agent' : "CloudCache Pip version 0.4", 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
+    headers = {'User-Agent' : self.headers["User-Agent"], 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
  
     #headers['HTTP_KEYS'] = json.dumps(keys)
     headers['keys'] = json.dumps(keys)
@@ -93,12 +94,12 @@ class CloudCache:
     
   def get(self, key):
     ts = self.__generate_timestamp(time.gmtime())
-    sig = self.__generate_signature("CloudCache", "GET", ts, self.skey)
+    sig = self.__generate_signature(service="CloudCache", operation="GET", timestamp=ts, secret_access_key=self.skey)
   
-    url = "http://" + self.host + ":" + self.port + "/"+key
+    url = "%s://%s:%s/%s" % (self.protocol, self.host, self.port, key)
     #print "get url = " + url
     
-    headers = {'User-Agent' : "CloudCache Pip version 0.4", 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
+    headers = {'User-Agent' : self.headers['User-Agent'], 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
 
     req = urllib2.Request(url, None, headers)
     ret = urllib2.urlopen(req)
@@ -107,11 +108,12 @@ class CloudCache:
 
   def set(self, key, val, ttl = 0):
     ts  = self.__generate_timestamp(time.gmtime())
-    sig = self.__generate_signature("CloudCache", "POST", ts, self.skey)
+    sig = self.__generate_signature(service="CloudCache", operation="POST", timestamp=ts, secret_access_key=self.skey)
   
-    url = "http://" + self.host + ":" + self.port + "/"+key
+    url = "%s://%s:%s/%s" % (self.protocol, self.host, self.port, key)
+
     #print "set (post) url = " + url
-    headers = {'User-Agent' : "CloudCache Pip version 0.4", 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
+    headers = {'User-Agent' : self.headers['User-Agent'], 'signature' : sig, 'timestamp' : ts, 'akey' : self.akey}
     if ttl != 0:
       headers['ttl'] = ttl
 
@@ -122,4 +124,3 @@ class CloudCache:
     ret = urllib2.urlopen(req)
 
     return str(ret.read())
-  
