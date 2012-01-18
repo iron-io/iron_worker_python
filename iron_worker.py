@@ -44,7 +44,7 @@ class IronWorker:
     USER_AGENT = "IronWorker Python v0.3"
 
     def __init__(self, token, project_id=None, host=DEFAULT_HOST, port=80,
-            version=2, protocol='http'):
+            version=2, protocol='http', config=None):
         """Prepare a configured instance of the API wrapper and return it.
 
         Keyword arguments:
@@ -55,11 +55,32 @@ class IronWorker:
         port -- The port of the API server. Defaults to 80.
         version -- The API version to use. Defaults to 2.
         protocol -- The protocol to use. Defaults to http.
+        config -- The config file to draw config values from. Defaults to None.
         """
-        self.url = "%s://%s:%s/%s/" % (protocol, host, port, version)
         self.token = token
         self.version = version
         self.project_id = project_id
+        self.protocol = protocol
+        self.host = host
+        self.port = port
+        self.version = version
+        if config is not None:
+            config_file = ConfigParser.RawConfigParser()
+            config_file.read(config)
+            if config_file.token is not None:
+                self.token = config_file.get("IronWorker", "token")
+            if config_file.project_id is not None:
+                self.project_id = config_file.get("IronWorker", "project_id")
+            if config_file.host is not None:
+                self.host = config_file.get("IronWorker", "host")
+            if config_file.port is not None:
+                self.port = config_file.get("IronWorker", "port")
+            if config_file.version is not None:
+                self.version = config_file.get("IronWorker", "version")
+            if config_file.protocol is not None:
+                self.protocol = config_file.get("IronWorker", "protocol")
+        self.url = "%s://%s:%s/%s/" % (self.protocol, self.host, self.port,
+                self.version)
         self.__setCommonHeaders()
 
     def __get(self, url, headers={}):
