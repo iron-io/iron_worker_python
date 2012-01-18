@@ -1,4 +1,4 @@
-from iron_worker_pip import *
+from iron_worker import *
 import unittest
 import ConfigParser
 import time
