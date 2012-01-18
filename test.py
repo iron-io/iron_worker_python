@@ -4,7 +4,7 @@ import ConfigParser
 import time
 
 
-class TestIronWorkerPip(unittest.TestCase):
+class TestIronWorker(unittest.TestCase):
 
     def setUp(self):
         config = ConfigParser.RawConfigParser()
@@ -41,7 +41,7 @@ class TestIronWorkerPip(unittest.TestCase):
         self.assertEqual(self.worker.headers['Accept-Encoding'],
                 "gzip, deflate")
         self.assertEqual(self.worker.headers['User-Agent'],
-                "IronWorker Python Pip v0.3")
+                "IronWorker Python v0.3")
 
     def test_postCode(self):
         IronWorker.createZip(destination="test.zip", files=["test.py"],

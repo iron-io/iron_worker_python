@@ -41,7 +41,7 @@ class RequestWithMethod(urllib2.Request):
 
 class IronWorker:
     DEFAULT_HOST = "worker-aws-us-east-1.iron.io"
-    USER_AGENT = "IronWorker Python Pip v0.3"
+    USER_AGENT = "IronWorker Python v0.3"
 
     def __init__(self, token, project_id=None, host=DEFAULT_HOST, port=80,
             version=2, protocol='http'):
@@ -80,7 +80,7 @@ class IronWorker:
         self.headers = {
             "Accept": "application/json",
             "Accept-Encoding": "gzip, deflate",
-            "User-Agent": "IronWorker Python Pip v0.3"
+            "User-Agent": "IronWorker Python v0.3"
         }
 
     def getTasks(self, project_id=None):
