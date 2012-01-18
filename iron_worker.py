@@ -10,6 +10,7 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import ssl
 import zipfile
+import argparse
 
 
 def file_exists(file):
@@ -103,6 +104,27 @@ class IronWorker:
             "Accept-Encoding": "gzip, deflate",
             "User-Agent": "IronWorker Python v0.3"
         }
+
+    @staticmethod
+    def getArgs():
+        """Get the arguments that are passed to all IronWorkers."""
+        parser = argparse.ArgumentParser(description="IronWorker")
+        parser.add_argument("-payload", type=str, required=False,
+                help="The location of a file containing a JSON payload.")
+        parser.add_argument("-d", type=str, required=False,
+                help="The directory that the worker is running from.")
+        parser.add_argument("-e", type=str, required=False,
+                help="The environment this worker is running under.")
+        parser.add_argument("-id", type=str, required=False,
+                help="This worker's unique identifier.")
+        return parser.parse_args()
+
+    @staticmethod
+    def getPayload():
+        """Get the payload that was sent to a worker."""
+        args = IronWorker.getArgs()
+        if args.payload is not None and file_exists(args.payload):
+            return json.loads(open(args.payload).read())
 
     def getTasks(self, project_id=None):
         """Execute an HTTP request to get a list of tasks, and return it.
