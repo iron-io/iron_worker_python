@@ -11,6 +11,7 @@ from poster.streaminghttp import register_openers
 import ssl
 import zipfile
 import argparse
+import ConfigParser
 
 
 def file_exists(file):
@@ -52,12 +53,12 @@ class IronWorker:
     DEFAULT_HOST = "worker-aws-us-east-1.iron.io"
     USER_AGENT = "IronWorker Python v0.3"
 
-    def __init__(self, token, project_id=None, host=DEFAULT_HOST, port=80,
+    def __init__(self, token=None, project_id=None, host=DEFAULT_HOST, port=80,
             version=2, protocol='http', config=None):
         """Prepare a configured instance of the API wrapper and return it.
 
         Keyword arguments:
-        token -- An API token found on http://hud.iron.io. (Required)
+        token -- An API token found on http://hud.iron.io. Defaults to None.
         project_id -- The ID for the project, found on http://hud.iron.io
         host -- The hostname of the API server.
                 Defaults to worker-aws-us-east-1.iron.io.
@@ -76,18 +77,34 @@ class IronWorker:
         if config is not None:
             config_file = ConfigParser.RawConfigParser()
             config_file.read(config)
-            if config_file.token is not None:
+            try:
                 self.token = config_file.get("IronWorker", "token")
-            if config_file.project_id is not None:
+            except ConfigParser.NoOptionError:
+                self.token = token
+            try:
                 self.project_id = config_file.get("IronWorker", "project_id")
-            if config_file.host is not None:
+            except ConfigParser.NoOptionError:
+                self.project_id = project_id                
+            try:
                 self.host = config_file.get("IronWorker", "host")
-            if config_file.port is not None:
+            except ConfigParser.NoOptionError:
+                self.host = host
+            try:
                 self.port = config_file.get("IronWorker", "port")
-            if config_file.version is not None:
+            except ConfigParser.NoOptionError:
+                self.port = port
+                
+            try:
                 self.version = config_file.get("IronWorker", "version")
-            if config_file.protocol is not None:
+            except ConfigParser.NoOptionError:
+                self.version = version
+            try:
                 self.protocol = config_file.get("IronWorker", "protocol")
+            except ConfigParser.NoOptionError:
+                self.protocol = protocol
+        if self.token is None or self.project_id is None:
+            raise IllegalArgumentException("Both token and project_id must \
+                    have a value")
         self.url = "%s://%s:%s/%s/" % (self.protocol, self.host, self.port,
                 self.version)
         self.__setCommonHeaders()
