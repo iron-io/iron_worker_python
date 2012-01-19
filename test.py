@@ -26,7 +26,6 @@ class TestIronWorker(unittest.TestCase):
         response = self.worker.postCode(name=self.code_name,
                 runFilename="test.py", zipFilename="test.zip")
 
-
     def test_setProject(self):
         self.assertNotEqual(self.worker.project_id, self.new_project_id)
 
@@ -130,6 +129,21 @@ class TestIronWorker(unittest.TestCase):
 
     def test_postSchedule(self):
         schedule_id = self.worker.postSchedule(name=self.code_name, delay=120)
+
+        schedules = self.worker.getSchedules()
+        schedule_ids = []
+        for schedule in schedules:
+            schedule_ids.append(schedule['id'])
+
+        self.assertIn(schedule_id, schedule_ids)
+
+    def test_postAdvancedSchedule(self):
+        start_at = time.gmtime(time.time() + 3600)  # one hour from now
+        schedule_id = self.worker.postSchedule(
+                name="advanced_%s" % self.code_name,
+                payload={"schedule": "AWESOME SCHEDULE!"},
+                code_name=self.code_name, start_at=start_at, run_every=3600,
+                run_times=8)
 
         schedules = self.worker.getSchedules()
         schedule_ids = []

@@ -23,6 +23,14 @@ def file_exists(file):
         return True
 
 
+class IllegalArgumentException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return repr(self.message)
+
+
 class RequestWithMethod(urllib2.Request):
 
     """Wrap urllib2 to make DELETE requests possible."""
@@ -125,6 +133,18 @@ class IronWorker:
         args = IronWorker.getArgs()
         if args.payload is not None and file_exists(args.payload):
             return json.loads(open(args.payload).read())
+
+    @staticmethod
+    def Rfc3339(timestamp = None):
+        if timestamp is None:
+            timestamp = time.gmtime()
+        base = time.strftime("%Y-%m-%dT%H:%M:%S", timestamp)
+        timezone = time.strftime("%z", timestamp)
+        if timezone is not None and timezone != "+00:00":
+            timezone = "%s:%s" % (timezone[:-2], timezone[-2:])
+        elif timezone == "+00:00":
+            timezone = "Z"
+        return "%s%s" % (base, timezone)
 
     def getTasks(self, project_id=None):
         """Execute an HTTP request to get a list of tasks, and return it.
@@ -376,15 +396,31 @@ class IronWorker:
         schedules = json.loads(body)
         return schedules['schedules']
 
-    def postSchedule(self, name, delay, project_id=None):
+    def postSchedule(self, name, delay=None, payload={}, code_name=None,
+            start_at=None, run_every=None, end_at=None, run_times=None,
+            priority=0, project_id=None):
 
         """Execute an HTTP request to create a scheduled task that will be
         executed later.
 
         Keyword arguments:
-        name -- A name for the worker that will execute the scheduled
-                task. (Required)
-        delay -- The number of seconds to delay execution for. (Required)
+        name -- A name for the schedule. (Required)
+        delay -- The number of seconds to delay execution for.
+                 Defaults to None.
+        payload -- The payload of arguments to execute the task with. Defaults
+                   to an empty dict.
+        code_name -- The name of the code package to execute. Defaults to the
+                     name of the schedule.
+        start_at -- A Time or DateTime object indicating when the schedule
+                    should start. Defaults to None.
+        run_every -- The number of seconds between runs. If omitted, the
+                     schedule will be run once. Defaults to None.
+        end_at -- A Time or DateTime object indicating when the schedule should
+                  end. Defaults to None.
+        run_times -- The number of times to run the task. Defaults to None.
+        priority -- The priority queue to run the job in (0, 1, 2). Run tasks
+                    at higher priority to decrease the time they may spend on
+                    queue once they come off the schedule. Defaults to 0.
         project_id -- The ID of the project to schedule the task under.
                       Defaults to the project ID set when the wrapper was
                       initialised.
@@ -393,41 +429,35 @@ class IronWorker:
         self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
+        if code_name is None:
+            code_name = name
         url = "%sprojects/%s/schedules?oauth=%s" % (self.url, project_id,
                 self.token)
-        timestamp = time.asctime()
 
-        schedules = [{"delay": delay, "code_name": name}]
-        payload = [{
-            "schedule": schedules[0],
-            "project_id": project_id,
-            "class_name": name,
-            "name": name,
-            "options": {},
-            "token": self.token,
-            "api_version": self.version,
-            "version": self.version,
-            "timestamp": timestamp,
-            "oauth": self.token,
-            "access_key": name,
-            "delay": delay
-        }]
-        options = {
-            "project_id": project_id,
-            "schedule": schedules[0],
-            "class_name": name,
-            "name": name,
-            "options": {},
-            "token": self.token,
-            "api_version": self.version,
-            "version": self.version,
-            "timestamp": timestamp,
-            "oauth": self.token,
-            "access_key": name,
-            "delay": delay
+        schedule = {
+            "name": name
         }
+        if delay is None and start_at is None:
+            raise IllegalArgumentException("Either delay or start_at needs \
+                    to be set.")
+        if delay is not None and start_at is None:
+            schedule['delay'] = delay
+        elif delay is None and start_at is not None:
+            schedule['start_at'] = IronWorker.Rfc3339(start_at)
+        elif delay is not None and start_at is not None:
+            schedule['start_at'] = IronWorker.Rfc3339(start_at)
+        schedule['code_name'] = code_name
+        if payload != {}:
+            schedule['payload'] = json.dumps(payload)
+        if run_every is not None:
+            schedule['run_every'] = run_every
+        if end_at is not None:
+            schedule['end_at'] = IronWorker.Rfc3339(end_at)
+        if run_times is not None:
+            schedule['run_times'] = run_times
+        schedule['priority'] = priority
 
-        data = {"schedules": schedules}
+        data = {"schedules": [schedule]}
         data = json.dumps(data)
         dataLen = len(data)
         headers = self.headers
