@@ -114,11 +114,11 @@ class TestIronWorker(unittest.TestCase):
 
         self.assertEqual(task_id, task['id'])
 
-    def test_deleteTask(self):
+    def test_cancelTask(self):
         tasks = self.worker.getTasks()
 
         for task in tasks:
-            self.worker.deleteTask(task_id=task['id'])
+            self.worker.cancelTask(task_id=task['id'])
 
         new_tasks = self.worker.getTasks()
         real_tasks = []
@@ -152,11 +152,11 @@ class TestIronWorker(unittest.TestCase):
 
         self.assertIn(schedule_id, schedule_ids)
 
-    def test_deleteSchedule(self):
+    def test_cancelSchedule(self):
         schedules = self.worker.getSchedules()
 
         for schedule in schedules:
-            self.worker.deleteSchedule(schedule_id=schedule['id'])
+            self.worker.cancelSchedule(schedule_id=schedule['id'])
 
         new_schedules = self.worker.getSchedules()
         real_schedules = []

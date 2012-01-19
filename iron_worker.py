@@ -135,7 +135,7 @@ class IronWorker:
             return json.loads(open(args.payload).read())
 
     @staticmethod
-    def Rfc3339(timestamp = None):
+    def Rfc3339(timestamp=None):
         if timestamp is None:
             timestamp = time.gmtime()
         base = time.strftime("%Y-%m-%dT%H:%M:%S", timestamp)
@@ -341,29 +341,37 @@ class IronWorker:
         s = ret.read()
         return
 
-    def deleteTask(self, task_id, project_id=None):
-        """Execute an HTTP request to delete a task.
+    def cancelTask(self, task_id, project_id=None):
+        """Execute an HTTP request to cancel a task.
 
         Keyword arguments:
-        task_id -- The ID of the task to be deleted. (Required)
+        task_id -- The ID of the task to be cancelled. (Required)
         project_id -- The ID of the project that contains the task. Defaults
                       to the project_id set when the wrapper was initialised.
         """
         self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
-        url = "%sprojects/%s/tasks/%s?oauth=%s" % (self.url, project_id,
+        url = "%sprojects/%s/tasks/%s/cancel?oauth=%s" % (self.url, project_id,
                 task_id, self.token)
-        req = RequestWithMethod(url, 'DELETE')
+        data = json.dumps({})
+        dataLen = len(data)
+        headers = self.headers
+        headers['Content-Type'] = "application/json"
+        headers['Content-Length'] = str(dataLen)
+
+        req = urllib2.Request(url, data, headers)
         ret = urllib2.urlopen(req)
         s = ret.read()
-        return
 
-    def deleteSchedule(self, schedule_id, project_id=None):
-        """Execute an HTTP request to delete a task schedule.
+        ret = json.loads(s)
+        return ret
+
+    def cancelSchedule(self, schedule_id, project_id=None):
+        """Execute an HTTP request to cancel a task schedule.
 
         Keyword arguments:
-        schedule_id -- The ID of the schedule to delete. (Required)
+        schedule_id -- The ID of the schedule to cancel. (Required)
         project_id -- The ID of the project that contains the schedule.
                       Defaults to the project_id set when the wrapper was
                       intialised.
@@ -371,12 +379,20 @@ class IronWorker:
         self.__setCommonHeaders()
         if project_id is None:
             project_id = self.project_id
-        url = "%sprojects/%s/schedules/%s?oauth=%s" % (self.url, project_id,
-                schedule_id, self.token)
-        req = RequestWithMethod(url, 'DELETE')
+        url = "%sprojects/%s/schedules/%s/cancel?oauth=%s" % (self.url,
+                project_id, schedule_id, self.token)
+        data = json.dumps({})
+        dataLen = len(data)
+        headers = self.headers
+        headers['Content-Type'] = "application/json"
+        headers['Content-Length'] = str(dataLen)
+
+        req = urllib2.Request(url, data, headers)
         ret = urllib2.urlopen(req)
         s = ret.read()
-        return
+
+        ret = json.loads(s)
+        return ret
 
     def getSchedules(self, project_id=None):
         """Execute an HTTP request to get a list of task schedules and return
@@ -488,20 +504,6 @@ class IronWorker:
             project_id = self.project_id
         url = "%sprojects/%s/tasks?oauth=%s" % (self.url, project_id,
                 self.token)
-        timestamp = time.asctime()
-        data = {
-            "code_name": name,
-            "payload": payload,
-            "class_name": name,
-            "name": name,
-            "options": {},
-            "token": self.token,
-            "api_version": self.version,
-            "version": self.version,
-            "timestamp": timestamp,
-            "oauth": self.token,
-            "access_key": name
-        }
         payload = json.dumps(payload)
         task = {
             "name": name,
