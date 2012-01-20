@@ -1,14 +1,10 @@
 # IronWorker For Python
 import os
-import sys
 import time
-from datetime import datetime
 import json
 import urllib2
-import urllib
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
-import ssl
 import zipfile
 import argparse
 import ConfigParser
@@ -18,7 +14,7 @@ def file_exists(file):
     """Check if a file exists."""
     try:
         open(file)
-    except IOError as e:
+    except IOError:
         return False
     else:
         return True
@@ -54,7 +50,7 @@ class IronWorker:
     USER_AGENT = "IronWorker Python v0.3"
 
     def __init__(self, token=None, project_id=None, host=DEFAULT_HOST, port=80,
-            version=2, protocol='http', config=None):
+            version=2, protocol='http', config=None, app_engine=False):
         """Prepare a configured instance of the API wrapper and return it.
 
         Keyword arguments:
@@ -66,6 +62,8 @@ class IronWorker:
         version -- The API version to use. Defaults to 2.
         protocol -- The protocol to use. Defaults to http.
         config -- The config file to draw config values from. Defaults to None.
+        app_engine -- Whether to run in App Engine compatibility mode.
+                      Defaults to False.
         """
         self.token = token
         self.version = version
@@ -74,6 +72,7 @@ class IronWorker:
         self.host = host
         self.port = port
         self.version = version
+        self.app_engine = app_engine
         if config is not None:
             config_file = ConfigParser.RawConfigParser()
             config_file.read(config)
@@ -118,9 +117,61 @@ class IronWorker:
                    with the request.
         """
         headers = dict(headers.items() + self.headers.items())
-        req = urllib2.Request(url, None, headers)
-        ret = urllib2.urlopen(req)
-        return ret.read()
+        if not self.app_engine:
+            req = urllib2.Request(url, None, headers)
+            ret = urllib2.urlopen(req)
+            return ret.read()
+        else:
+            from google.appengine.api import urlfetch
+            return urlfetch.fetch(url=url, method=urlfetch.GET,
+                    headers=headers).content
+
+    def __post(self, url, payload={}, headers={}):
+        """Execute an HTTP POST request and return the result.
+
+        Keyword arguments:
+        url -- The url to execute the request against. (Required)
+        payload -- A dict of key-value form data to send with the
+                   request. Will be urlencoded.
+        headers -- A dict of headers to merge with self.headers and send
+                   with the request.
+        """
+        headers = dict(headers.items() + self.headers.items())
+        if not self.app_engine:
+            req = urllib2.Request(url, payload, headers)
+            ret = urllib2.urlopen(req)
+            return ret.read()
+        else:
+            from google.appengine.api import urlfetch
+            if not isinstance(payload, basestring):
+                import urllib
+                payload = urllib.urlencode(payload)
+            return urlfetch.fetch(url=url, payload=payload,
+                    method=urlfetch.POST, headers=headers).content
+
+    def __delete(self, url, payload={}, headers={}):
+        """Execute an HTTP DELETE request and return the result.
+
+        Keyword arguments:
+        url -- The url to execute the request against. (Required)
+        payload -- A dict of key-value form data to send with the
+                   request. Will be urlencoded.
+        headers -- A dict of headers to merge with self.headers and send
+                   with the request.
+        """
+        headers = dict(headers.items() + self.headers.items())
+        if not self.app_engine:
+            req = RequestWithMethod(url=url, method='DELETE', data=payload,
+                    headers=headers)
+            ret = urllib2.urlopen(req)
+            s = ret.read()
+        else:
+            from google.appengine.api import urlfetch
+            if not isinstance(payload, basestring):
+                import urllib
+                payload = urllib.urlencode(payload)
+            return urlfetch.fetch(url=url, payload=payload,
+                    method=urlfetch.DELETE, headers=headers).content
 
     def __setCommonHeaders(self):
         """Modify your headers to match the JSON default values."""
@@ -302,10 +353,8 @@ class IronWorker:
             "data": data
         })
 
-        headers = dict(headers.items() + self.headers.items())
-        req = urllib2.Request(url, datagen, headers)
-        ret = urllib2.urlopen(req)
-        body = ret.read()
+        body = self.__post(url=url, payload=str().join(datagen),
+                headers=headers)
         return json.loads(body)
 
     def postProject(self, name):
@@ -331,9 +380,7 @@ class IronWorker:
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
 
-        req = urllib2.Request(url, data, headers)
-        ret = urllib2.urlopen(req)
-        s = ret.read()
+        s = self.__post(url=url, payload=data, headers=headers)
         msg = json.loads(s)
         project_id = msg['id']
         self.__setCommonHeaders()
@@ -377,9 +424,7 @@ class IronWorker:
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
 
-        req = urllib2.Request(url, data, headers)
-        ret = urllib2.urlopen(req)
-        s = ret.read()
+        s = self.__post(url=url, payload=data, headers=headers)
 
         ret = json.loads(s)
         return ret
@@ -404,9 +449,7 @@ class IronWorker:
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
 
-        req = urllib2.Request(url, data, headers)
-        ret = urllib2.urlopen(req)
-        s = ret.read()
+        s = self.__post(url=url, payload=data, headers=headers)
 
         ret = json.loads(s)
         return ret
@@ -496,9 +539,7 @@ class IronWorker:
         headers = self.headers
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
-        req = urllib2.Request(url, data, headers)
-        ret = urllib2.urlopen(req)
-        s = ret.read()
+        s = self.__post(url=url, payload=data, headers=headers)
 
         msg = json.loads(s)
         schedule_id = msg['schedules'][0]['id']
@@ -534,9 +575,7 @@ class IronWorker:
         headers['Content-Type'] = "application/json"
         headers['Content-Length'] = str(dataLen)
 
-        req = urllib2.Request(url, data, headers)
-        ret = urllib2.urlopen(req)
-        s = ret.read()
+        s = self.__post(url=url, payload=data, headers=headers)
 
         ret = json.loads(s)
         return ret
