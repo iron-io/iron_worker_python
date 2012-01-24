@@ -371,7 +371,6 @@ class IronWorker:
             "class_name": name,
             "access_key": name
         }]
-        timestamp = time.asctime()
 
         data = {"name": name}
         data = json.dumps(data)
