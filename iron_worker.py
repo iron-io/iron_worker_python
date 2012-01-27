@@ -642,11 +642,11 @@ class IronWorker:
         if not os.path.isdir(directory):
             return False
 
-        files = getFilenames(directory)
+        files = IronWorker.getFilenames(directory)
         if len(files) < 1:
             return False
 
-        return createZip(files, destination, overwrite)
+        return IronWorker.createZip(files, destination, overwrite)
 
     @staticmethod
     def getFilenames(directory):
