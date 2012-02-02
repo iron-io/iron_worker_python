@@ -64,7 +64,7 @@ Where 'HelloWorld' is a worker name which should be used later for queueing and 
 ## Queueing a Worker
 
 ```python
-task_id = worker.postTask(name='HelloWorld')
+task = worker.postTask(name='HelloWorld')
 ```
 
 Worker should start in a few seconds.
@@ -82,8 +82,8 @@ worker.postSchedule(name='HelloWorld', delay=start_at)
 To get the status of a worker, you can use the ```getTaskDetails()``` method.
 
 ```python
-task_id = worker.postTask('HelloWorld')
-details = worker.getTaskDetails(task_id=task_id);
+task = worker.postTask('HelloWorld')
+details = worker.getTaskDetails(task_id=task['tasks'][0]['id']);
 
 print details['status'] # prints 'queued', 'complete', 'error' etc.
 ```
@@ -94,9 +94,9 @@ Use any function that print text inside your worker to put messages to log.
 
 ```python
 import time
-task_id = worker.postTask('HelloWorld')
+task = worker.postTask('HelloWorld')
 time.sleep(10)
-details = worker.getTaskDetails(task_id)
+details = worker.getTaskDetails(task['tasks'][0]['id'])
 # Check log only if task is finished.
 if details['status'] != 'queued':
     log = worker.getLog(task_id);
