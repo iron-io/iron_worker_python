@@ -7,7 +7,7 @@ except ImportError:
     from distutils.core import setup
 
 
-required = [ ]
+required = ["poster"]
 
 
 setup(
@@ -18,5 +18,4 @@ setup(
     url='http://iron.io',
     install_requires=required,
     packages=[ 'iron_worker' ],
-    package_data = { '' : [ 'poster/*' ] },
 )
