@@ -20,6 +20,5 @@ setup(
     author_email="support@iron.io",
     url='http://iron.io/products/worker',
     install_requires=required,
-    packages=[ '' ],
-    package_dir={'':'iron_worker'},
+    packages=[ 'iron_worker' ],
 )

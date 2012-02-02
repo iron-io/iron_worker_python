@@ -1,14 +1,16 @@
 # IronWorker For Python
 import os
+import sys
 import time
-import json
 import urllib2
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import zipfile
-import argparse
 import ConfigParser
-
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 def file_exists(file):
     """Check if a file exists."""
@@ -183,24 +185,21 @@ class IronWorker:
 
     @staticmethod
     def getArgs():
-        """Get the arguments that are passed to all IronWorkers."""
-        parser = argparse.ArgumentParser(description="IronWorker")
-        parser.add_argument("-payload", type=str, required=False,
-                help="The location of a file containing a JSON payload.")
-        parser.add_argument("-d", type=str, required=False,
-                help="The directory that the worker is running from.")
-        parser.add_argument("-e", type=str, required=False,
-                help="The environment this worker is running under.")
-        parser.add_argument("-id", type=str, required=False,
-                help="This worker's unique identifier.")
-        return parser.parse_args()
+        """Get the arguments that are passed to all IronWorkers as a dict"""
+        args = { }
+        for i in range(len(sys.argv)):
+            if sys.argv[i].startswith("-") and (i+1) < len(sys.argv):
+                key = sys.argv[i][1:]
+                i += 1
+                args[key] = sys.argv[i]
+        return args
 
     @staticmethod
     def getPayload():
         """Get the payload that was sent to a worker."""
         args = IronWorker.getArgs()
-        if args.payload is not None and file_exists(args.payload):
-            return json.loads(open(args.payload).read())
+        if args.has_key('payload') and file_exists(args['payload']):
+            return json.loads(open(args['payload']).read())
 
     @staticmethod
     def Rfc3339(timestamp=None):
