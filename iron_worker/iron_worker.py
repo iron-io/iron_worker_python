@@ -12,6 +12,7 @@ try:
 except ImportError:
     import simplejson as json
 
+
 def file_exists(file):
     """Check if a file exists."""
     try:
@@ -85,7 +86,7 @@ class IronWorker:
             try:
                 self.project_id = config_file.get("IronWorker", "project_id")
             except ConfigParser.NoOptionError:
-                self.project_id = project_id                
+                self.project_id = project_id
             try:
                 self.host = config_file.get("IronWorker", "host")
             except ConfigParser.NoOptionError:
@@ -94,7 +95,6 @@ class IronWorker:
                 self.port = config_file.get("IronWorker", "port")
             except ConfigParser.NoOptionError:
                 self.port = port
-                
             try:
                 self.version = config_file.get("IronWorker", "version")
             except ConfigParser.NoOptionError:
@@ -186,9 +186,9 @@ class IronWorker:
     @staticmethod
     def getArgs():
         """Get the arguments that are passed to all IronWorkers as a dict"""
-        args = { }
+        args = {}
         for i in range(len(sys.argv)):
-            if sys.argv[i].startswith("-") and (i+1) < len(sys.argv):
+            if sys.argv[i].startswith("-") and (i + 1) < len(sys.argv):
                 key = sys.argv[i][1:]
                 i += 1
                 args[key] = sys.argv[i]
@@ -198,7 +198,7 @@ class IronWorker:
     def getPayload():
         """Get the payload that was sent to a worker."""
         args = IronWorker.getArgs()
-        if args.has_key('payload') and file_exists(args['payload']):
+        if 'payload' in args and file_exists(args['payload']):
             return json.loads(open(args['payload']).read())
 
     @staticmethod
