@@ -21,10 +21,10 @@ class TestIronWorker(unittest.TestCase):
         self.worker = IronWorker(token=self.token, host=self.host,
             port=self.port, version=self.version, project_id=self.project_id)
 
-        IronWorker.createZip(destination="test.zip", files=["test.py"],
-                overwrite=True)
+        IronWorker.zipDirectory(destination="test.zip", overwrite=True,
+                directory="testDir")
         response = self.worker.postCode(name=self.code_name,
-                runFilename="test.py", zipFilename="test.zip")
+                runFilename="testDir/hello.py", zipFilename="test.zip")
 
     def test_setProject(self):
         self.assertNotEqual(self.worker.project_id, self.new_project_id)
