@@ -645,7 +645,7 @@ class IronWorker:
         if len(files) < 1:
             return False
 
-        return IronWorker.createZip(files, destination, overwrite)
+        return IronWorker.createZip(destination=destination, files=files, overwrite=overwrite)
 
     @staticmethod
     def getFilenames(directory):
