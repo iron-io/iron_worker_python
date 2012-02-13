@@ -43,10 +43,10 @@ class TestIronWorker(unittest.TestCase):
                 "IronWorker Python v0.3")
 
     def test_postCode(self):
-        IronWorker.createZip(destination="test.zip", files=["test.py"],
-                overwrite=True)
+        IronWorker.createZip(destination="test.zip", overwrite=True,
+                files=["testDir/hello.py"])
         response = self.worker.postCode(name=self.code_name,
-                runFilename="test.py", zipFilename="test.zip")
+                runFilename="testDir/hello.py", zipFilename="test.zip")
         self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
@@ -54,6 +54,18 @@ class TestIronWorker(unittest.TestCase):
         for code in codes:
             code_names.append(code["name"])
         self.assertIn(self.code_name, code_names)
+
+    def test_postZip(self):
+        IronWorker.zipDirectory(directory="testDir", destination="test.zip",
+                overwrite=True)
+        response = self.worker.postCode(name=self.code_name,
+                runFilename="testDir/hello.py", zipFilename="test.zip")
+        self.assertEqual(response['status_code'], 200)
+
+        codes = self.worker.getCodes()
+
+        code = self.worker.getCodeDetails(code_id=codes[0]['id'])
+        self.assertEqual(codes[0]['id'], code['id'])
 
     def test_getCodeDetails(self):
         IronWorker.createZip(destination="test.zip", files=["test.py"],
