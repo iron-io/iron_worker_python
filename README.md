@@ -10,7 +10,7 @@ IronWorker is a massively scalable background processing system.
 To start using iron_worker_python, you need to sign up and get an oauth token.
 
 1. Go to http://iron.io/ and sign up.
-2. Get an Oauth Token at http://hud.iron.io/tokens
+2. Get an OAuth Token at http://hud.iron.io/tokens
 
 ## Install iron_worker_python
 Just copy ```iron_worker.py``` and ```poster``` and include iron_worker.py in your script:
@@ -72,10 +72,12 @@ Worker should start in a few seconds.
 ## Scheduling a Worker
 If you want to run your code at a delay, you should schedule it:
 
+If you want to run your code repeatedly, you can create a Scheduled Task:
+
 ```python
-# 3 minutes from now
-start_at =  3*60
-worker.postSchedule(name='HelloWorld', delay=start_at)
+# run every hour, five times in total
+run_every = 60*60 # 60 seconds in a minute, 60 minutes in an hour
+worker.postSchedule(name='HelloWorld', run_every=run_every, run_times=5)
 ```
 
 ## Status of a Worker
