@@ -149,6 +149,17 @@ class TestIronWorker(unittest.TestCase):
 
         self.assertIn(schedule_id, schedule_ids)
 
+    def test_postScheduleAndPayload(self):
+        schedule_id = self.worker.postSchedule(name=self.code_name, delay=120,
+                        payload={"foo": "bar"})
+
+        schedules = self.worker.getSchedules()
+        schedule_ids = []
+        for schedule in schedules:
+            schedule_ids.append(schedule['id'])
+
+        self.assertIn(schedule_id, schedule_ids)
+
     def test_postAdvancedSchedule(self):
         start_at = time.gmtime(time.time() + 3600)  # one hour from now
         schedule_id = self.worker.postSchedule(

@@ -521,8 +521,7 @@ class IronWorker:
         elif delay is not None and start_at is not None:
             schedule['start_at'] = IronWorker.Rfc3339(start_at)
         schedule['code_name'] = code_name
-        if payload != {}:
-            schedule['payload'] = json.dumps(payload)
+        schedule['payload'] = json.dumps(payload)
         if run_every is not None:
             schedule['run_every'] = run_every
         if end_at is not None:
