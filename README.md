@@ -129,5 +129,5 @@ When your code is executed, it will be passed three program arguments:
 
 You can find more documentation here:
 
-* http://docs.iron.io Full documetation for iron.io products.
+* [Iron.io Dev Center](http://dev.iron.io): Full documentation for Iron.io products.
 * [IronWorker Python Wiki pages](https://github.com/iron-io/iron_worker_python/wiki).
