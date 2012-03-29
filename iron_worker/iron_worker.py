@@ -5,6 +5,7 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import zipfile
 import ConfigParser
+import iron_rest
 try:
         import json
 except ImportError:
@@ -84,12 +85,11 @@ class IronWorker:
                 if self.token is None or self.project_id is None:
                         raise ValueError("Both token and project_id \
                                         must have a value")
-                        self.client = iron_rest.IronClient(name=NAME,
-                                        version=VERSION, host=self.host,
-                                        project_id=self.project_id,
-                                        token=self.project_id,
-                                        protocol=self.protocol, port=self.port,
-                                        api_version=API_VERSION)
+                self.client = iron_rest.IronClient(name=IronWorker.NAME,
+                                version=IronWorker.VERSION, host=self.host,
+                                project_id=self.project_id, port=self.port,
+                                token=self.project_id, protocol=self.protocol,
+                                api_version=IronWorker.API_VERSION)
 
         @staticmethod
         def getArgs():
@@ -194,7 +194,7 @@ class IronWorker:
                         "data": data
                 })
 
-                resp = self.client.post(url=url, body=str().join(datagen),
+                resp = self.client.post(url="code", body=str().join(datagen),
                                 headers=headers)
                 return json.loads(resp['body'])
 

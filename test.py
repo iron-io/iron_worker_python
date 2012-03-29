@@ -1,52 +1,24 @@
 from iron_worker import *
 import unittest
-import ConfigParser
 import time
 
 
 class TestIronWorker(unittest.TestCase):
 
     def setUp(self):
-        config = ConfigParser.RawConfigParser()
-        config.read('config.ini')
-        self.token = config.get("IronWorker", "token")
-        self.host = config.get("IronWorker", "host")
-        self.port = config.get("IronWorker", "port")
-        self.version = config.get("IronWorker", "version")
-        self.project_id = config.get("IronWorker", "project_id")
-        self.new_project_id = "New Project Id"
-
         self.code_name = "test%d" % time.time()
-
-        self.worker = IronWorker(token=self.token, host=self.host,
-            port=self.port, version=self.version, project_id=self.project_id)
+        self.worker = IronWorker(config="config.ini")
 
         IronWorker.zipDirectory(destination="test.zip", overwrite=True,
                 directory="testDir")
         response = self.worker.postCode(name=self.code_name,
-                runFilename="testDir/hello.py", zipFilename="test.zip")
-
-    def test_setProject(self):
-        self.assertNotEqual(self.worker.project_id, self.new_project_id)
-
-        self.worker.setProject(self.new_project_id)
-        self.assertEqual(self.worker.project_id, self.new_project_id)
-
-        self.worker.setProject(self.project_id)
-        self.assertEqual(self.worker.project_id, self.project_id)
-
-    def test_headers(self):
-        self.assertEqual(self.worker.headers['Accept'], "application/json")
-        self.assertEqual(self.worker.headers['Accept-Encoding'],
-                "gzip, deflate")
-        self.assertEqual(self.worker.headers['User-Agent'],
-                "IronWorker Python v0.3")
+                runFilename="hello.py", zipFilename="test.zip")
 
     def test_postCode(self):
         IronWorker.createZip(destination="test.zip", overwrite=True,
-                files=["testDir/hello.py"])
+                files=["hello.py"])
         response = self.worker.postCode(name=self.code_name,
-                runFilename="testDir/hello.py", zipFilename="test.zip")
+                runFilename="hello.py", zipFilename="test.zip")
         self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
@@ -59,7 +31,7 @@ class TestIronWorker(unittest.TestCase):
         IronWorker.zipDirectory(directory="testDir", destination="test.zip",
                 overwrite=True)
         response = self.worker.postCode(name=self.code_name,
-                runFilename="testDir/hello.py", zipFilename="test.zip")
+                runFilename="hello.py", zipFilename="test.zip")
         self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
