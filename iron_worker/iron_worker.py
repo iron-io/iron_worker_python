@@ -5,6 +5,7 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 import zipfile
 import ConfigParser
+import time
 import iron_rest
 try:
         import json
@@ -88,7 +89,7 @@ class IronWorker:
                 self.client = iron_rest.IronClient(name=IronWorker.NAME,
                                 version=IronWorker.VERSION, host=self.host,
                                 project_id=self.project_id, port=self.port,
-                                token=self.project_id, protocol=self.protocol,
+                                token=self.token, protocol=self.protocol,
                                 api_version=IronWorker.API_VERSION)
 
         @staticmethod
@@ -128,7 +129,7 @@ class IronWorker:
                 return it.
                 """
                 resp = self.client.get("tasks")
-                tasks = json.loads(body["body"])
+                tasks = json.loads(resp["body"])
                 return tasks['tasks']
 
         def getTaskDetails(self, task_id):
@@ -194,7 +195,7 @@ class IronWorker:
                         "data": data
                 })
 
-                resp = self.client.post(url="code", body=str().join(datagen),
+                resp = self.client.post(url="codes", body=str().join(datagen),
                                 headers=headers)
                 return json.loads(resp['body'])
 

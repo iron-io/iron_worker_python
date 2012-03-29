@@ -119,7 +119,7 @@ class TestIronWorker(unittest.TestCase):
         for schedule in schedules:
             schedule_ids.append(schedule['id'])
 
-        self.assertIn(schedule_id, schedule_ids)
+        self.assertIn(schedule_id[0]["id"], schedule_ids)
 
     def test_postScheduleAndPayload(self):
         schedule_id = self.worker.postSchedule(name=self.code_name, delay=120,
@@ -130,7 +130,7 @@ class TestIronWorker(unittest.TestCase):
         for schedule in schedules:
             schedule_ids.append(schedule['id'])
 
-        self.assertIn(schedule_id, schedule_ids)
+        self.assertIn(schedule_id[0]["id"], schedule_ids)
 
     def test_postAdvancedSchedule(self):
         start_at = time.gmtime(time.time() + 3600)  # one hour from now
@@ -145,7 +145,7 @@ class TestIronWorker(unittest.TestCase):
         for schedule in schedules:
             schedule_ids.append(schedule['id'])
 
-        self.assertIn(schedule_id, schedule_ids)
+        self.assertIn(schedule_id[0]["id"], schedule_ids)
 
     def test_cancelSchedule(self):
         schedules = self.worker.getSchedules()
