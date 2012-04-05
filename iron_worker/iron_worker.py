@@ -601,7 +601,8 @@ class IronWorker:
         return body
 
     @staticmethod
-    def createZip(destination, base_dir='', files=[], overwrite=False):
+    def createZip(destination, base_dir='', files=[], overwrite=False,
+            root_dir=None):
         """Create a zip from an array of filenames.
 
         Keyword arguments:
@@ -612,17 +613,29 @@ class IronWorker:
         files -- A list of files to included in the zip. Defaults to [].
         overwrite -- Whether the zip file should be overwritten if it exists.
                      Defaults to False.
+        root_dir -- The path that is prepended to all items in the files list, 
+                    which will not be included in the zip directroy structure.
+                    This setting is ignored by files not prefixed with the 
+                    path.
         """
         if file_exists(destination) and not overwrite:
             return False
+        if type(root_dir) == type(''):
+            root_dir = [root_dir]
+        for dirindex, dir in enumerate(root_dir):
+            root_dir[dirindex] = dir.strip("/")
         valid_files = []
         for file in files:
+            newfile = (file, file)
             if file_exists(file):
-                valid_files.append(file)
+                for dir in root_dir:
+                    if file.strip("/").find(dir) == 0:
+                        newfile = (file, file.lstrip("/").lstrip(dir))
+                valid_files.append(newfile)
         if len(valid_files) > 0:
             zip = zipfile.ZipFile(destination, "w")
             for file in valid_files:
-                zip.write(file, os.path.join(base_dir, file))
+                zip.write(file[0], os.path.join(base_dir, file[1]))
             zip.close()
         return file_exists(destination)
 
@@ -641,6 +654,7 @@ class IronWorker:
             return False
 
         files = IronWorker.getFilenames(directory)
+        print files
         if len(files) < 1:
             return False
 
