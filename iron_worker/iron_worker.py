@@ -658,5 +658,6 @@ class IronWorker:
         names = []
         for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
-                names.append(os.path.join(dirname, filename))
+                path = dirname.split(os.sep)
+                names.append(os.path.join(os.sep.join(path[1:]), filename))
         return names
