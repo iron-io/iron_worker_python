@@ -659,7 +659,7 @@ class IronWorker:
             return False
 
         return IronWorker.createZip(files=files, destination=destination,
-                        overwrite=overwrite)
+                        overwrite=overwrite, root_dir=directory)
 
     @staticmethod
     def getFilenames(directory):
@@ -672,6 +672,5 @@ class IronWorker:
         names = []
         for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
-                path = dirname.split(os.sep)
-                names.append(os.path.join(os.sep.join(path[1:]), filename))
+                names.append(os.path.join(dirname, filename))
         return names
