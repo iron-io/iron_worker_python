@@ -543,7 +543,7 @@ class IronWorker:
         self.__setCommonHeaders()
         return schedule_id
 
-    def postTask(self, name, payload={}, project_id=None):
+    def postTask(self, name, payload={}, project_id=None, priority=0, timeout=3600, delay=0):
         """Executes an HTTP request to create a task that will be executed by
         the worker.
 
@@ -553,6 +553,10 @@ class IronWorker:
         project_id -- The ID of the project the task is to be created under.
                       Defaults to the project ID set when the wrapper was
                       initialised.
+        priority --  The priority queue to run the task in. Valid values are 0, 1, and 2. 0 is the default.
+        timeout --  The maximum runtime of your task in seconds. No task can exceed 3600 seconds (60 minutes).
+                    The default is 3600 but can be set to a shorter duration.
+        delay -- The number of seconds to delay before actually queuing the task. Default is 0.
         """
         self.__setCommonHeaders()
         if project_id is None:
@@ -563,7 +567,10 @@ class IronWorker:
         task = {
             "name": name,
             "code_name": name,
-            "payload": payload
+            "payload": payload,
+            "priority": priority,
+            "timeout" : timeout,
+            "delay" : delay,
         }
         tasks = {"tasks": [task]}
         data = json.dumps(tasks)
