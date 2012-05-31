@@ -207,10 +207,12 @@ class IronWorker:
             timestamp = time.gmtime()
         base = time.strftime("%Y-%m-%dT%H:%M:%S", timestamp)
         timezone = time.strftime("%z", timestamp)
-        if timezone is not None and timezone != "+00:00":
+        if timezone is not None and timezone != "+00:00" and timezone != "":
             timezone = "%s:%s" % (timezone[:-2], timezone[-2:])
         elif timezone == "+00:00":
             timezone = "Z"
+        else:
+            timezone = "-00:00"
         return "%s%s" % (base, timezone)
 
     def getTasks(self, project_id=None):
