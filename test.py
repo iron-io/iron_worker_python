@@ -10,16 +10,12 @@ class TestIronWorker(unittest.TestCase):
         config = ConfigParser.RawConfigParser()
         config.read('config.ini')
         self.token = config.get("IronWorker", "token")
-        self.host = config.get("IronWorker", "host")
-        self.port = config.get("IronWorker", "port")
-        self.version = config.get("IronWorker", "version")
         self.project_id = config.get("IronWorker", "project_id")
         self.new_project_id = "New Project Id"
 
         self.code_name = "test%d" % time.time()
 
-        self.worker = IronWorker(token=self.token, host=self.host,
-            port=self.port, version=self.version, project_id=self.project_id)
+        self.worker = IronWorker(token=self.token, project_id=self.project_id)
 
         IronWorker.zipDirectory(destination="test.zip", overwrite=True,
                 directory="testDir")
@@ -47,7 +43,6 @@ class TestIronWorker(unittest.TestCase):
                 files=["testDir/hello.py"])
         response = self.worker.postCode(name=self.code_name,
                 runFilename="testDir/hello.py", zipFilename="test.zip")
-        self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
         code_names = []
@@ -60,7 +55,6 @@ class TestIronWorker(unittest.TestCase):
                 overwrite=True)
         response = self.worker.postCode(name=self.code_name,
                 runFilename="testDir/hello.py", zipFilename="test.zip")
-        self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
 
@@ -72,7 +66,6 @@ class TestIronWorker(unittest.TestCase):
                 overwrite=True)
         response = self.worker.postCode(name=self.code_name,
                 runFilename="test.py", zipFilename="test.zip")
-        self.assertEqual(response['status_code'], 200)
 
         codes = self.worker.getCodes()
 
@@ -87,7 +80,6 @@ class TestIronWorker(unittest.TestCase):
         }
         resp = self.worker.postTask(name=self.code_name, payload=payload)
 
-        self.assertEqual(resp['status_code'], 200)
         self.assertEqual(len(resp['tasks']), 1)
 
         task_id = resp['tasks'][0]['id']
@@ -107,7 +99,6 @@ class TestIronWorker(unittest.TestCase):
         }
         resp = self.worker.postTask(name=self.code_name, payload=payload)
 
-        self.assertEqual(resp['status_code'], 200)
         self.assertEqual(len(resp['tasks']), 1)
 
         task_id = resp['tasks'][0]['id']
