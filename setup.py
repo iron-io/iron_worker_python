@@ -24,8 +24,7 @@ setup(
                 "Topic :: Software Development :: Libraries :: Python Modules",
 
         ],
-        long_description="""\
-IronWorker Python Library
+        long_description="""IronWorker Python Library
 -------------------------
 
 This package offers a client interface to the Iron.io IronWorker service. It 
