@@ -14,16 +14,16 @@ To start using iron_worker_python, you need to sign up and get an OAuth token.
 
 ## Install iron_worker_python
 
-The recommended way to install iron_worker_python is through `pip` or `easy_install`. The package name is `iron_worker`:
+The recommended way to install iron_worker_python is through `pip` or `easy_install`. The package name is [iron-worker](http://pypi.python.org/pypi/iron-worker):
 
 ```
-$ easy_install iron_worker
+$ easy_install iron-worker
 ```
 
 For `pip`:
 
 ```
-$ pip install iron_worker
+$ pip install iron-worker
 ```
 
 If you don't want to use `pip` or `easy_install`, you can always install from source. First, you'll need [iron_core_python](https://github.com/iron-io/iron_core_python). Download that; the file you're after is named iron_core.py. Then, download the [iron_worker_python](https://github.com/iron-io/iron_worker_python) library. The file you're after is named iron_worker.py. As long as both iron_core.py and iron_worker.py are in a directory in the import path, you're all set.
