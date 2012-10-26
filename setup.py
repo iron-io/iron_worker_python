@@ -4,7 +4,7 @@ setup(
         name='iron-worker',
         py_modules=["iron_worker"],
 	packages=["testDir"],
-        version='0.1.0',
+        version='1.0.0',
         install_requires=["iron_core"],
         description='The Python client for IronWorker, a cloud service for background processing.',
         author='Iron.io',
