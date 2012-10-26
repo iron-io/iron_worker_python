@@ -144,7 +144,7 @@ Likewise, if you'd like to run a task at a specific time, doing so is easy. Just
 
 ```python
 task = Task(code_name="HelloFuture")
-task.start_at = datetime.now() + timedelta(hours=1) # start tomorrow
+task.start_at = datetime.now() + timedelta(hours=1) # start in an hour
 response = worker.queue(task)
 ```
 
