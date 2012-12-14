@@ -221,7 +221,7 @@ class CodePackage:
 
 class IronWorker:
     NAME = "iron_worker_python"
-    VERSION = "1.0.1"
+    VERSION = "1.1.0"
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
