@@ -182,6 +182,22 @@ class CodePackage:
             for dest, loc in self.files.iteritems():
                 self.executable = dest
 
+    def merge_dependency(self, dep):
+        dependency = __import__(dep)
+	location = os.path.dirname(dependency.__file__)
+	print location
+	parent = location.rstrip(os.path.basename(location))
+	print parent
+	for dirname, dirnames, filenames in os.walk(location):
+	    for filename in filenames:
+	        path = os.path.join(dirname, filename)
+		if path.startswith(parent):
+		    newpath = path[len(parent):]
+		else:
+		    newpath = path
+		ziploc = newpath.lstrip("/")
+		self.files[ziploc] = path
+
     def zip(self, destination=None, overwrite=True):
         if destination is None:
             if self.name is not None:
