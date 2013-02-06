@@ -11,10 +11,10 @@ class TestIronWorker(unittest.TestCase):
 
         self.worker = IronWorker()
 
-	self.package = CodePackage()
-	self.package.merge("testDir", True)
-	self.package.executable = "hello.py"
-	self.worker.upload(self.package, name=self.code_name)
+        self.package = CodePackage()
+        self.package.merge("testDir", True)
+        self.package.executable = "hello.py"
+        self.worker.upload(self.package, name=self.code_name)
 
     def test_getCodeDetails(self):
         codes = self.worker.codes()
@@ -80,8 +80,8 @@ class TestIronWorker(unittest.TestCase):
         schedule_ids = []
         for schedule in schedules:
             schedule_ids.append(schedule.id)
-	
-	time.sleep(2)
+    
+        time.sleep(2)
 
         self.assertIn(resp.id, schedule_ids)
 
@@ -94,12 +94,12 @@ class TestIronWorker(unittest.TestCase):
         for schedule in schedules:
             schedule_ids.append(schedule.id)
 
-	time.sleep(2)
+        time.sleep(2)
 
         self.assertIn(resp.id, schedule_ids)
 
     def test_postAdvancedSchedule(self):
-	delta = timedelta(hours=1)
+        delta = timedelta(hours=1)
         start_at = datetime.now() + delta # one hour from now
         resp = self.worker.queue(
                 code_name=self.code_name,
@@ -110,8 +110,8 @@ class TestIronWorker(unittest.TestCase):
         schedule_ids = []
         for schedule in schedules:
             schedule_ids.append(schedule.id)
-	
-	time.sleep(2)
+    
+        time.sleep(2)
 
         self.assertIn(resp.id, schedule_ids)
 
