@@ -221,7 +221,7 @@ class CodePackage:
 
 class IronWorker:
     NAME = "iron_worker_python"
-    VERSION = "1.1.0"
+    VERSION = "1.2.0"
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
@@ -364,7 +364,7 @@ class IronWorker:
             tasks.append(Task(raw_task))
         return tasks
 
-    def queue(self, task=None, tasks=None, **kwargs):
+    def queue(self, task=None, tasks=None, retry=None, **kwargs):
         tasks_data = []
         if task is None:
             task = Task(**kwargs)
@@ -405,8 +405,11 @@ class IronWorker:
             tasks_data.append(task_data)
         data = json.dumps({type_str: tasks_data})
         headers = {"Content-Type": "application/json"}
-
-        resp = self.client.post(type_str, body=data, headers=headers)
+        
+        if retry is not None:
+            resp = self.client.post(type_str, body=data, headers=headers, retry=retry)
+        else:
+            resp = self.client.post(type_str, body=data, headers=headers)
         tasks = resp["body"]
         if len(tasks[type_str]) > 1:
             return [Task(task, scheduled=(type_str == "schedules"))
