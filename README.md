@@ -58,33 +58,28 @@ print "Hello Python World!\n"
 
 ## Upload code to IronWorker
 
-Uploading code to the server is done by creating a code package and uploading it. Creating a code package is simple:
+### Get the `iron_worker_ng` Gem
 
-```python
-code = CodePackage(name="WorkerName")
-code.merge("/path/to/file")
-code.executable = "/path/to/file"
+[Iron.io](http://www.iron.io) has a [command line interface](http://dev.iron.io/worker/reference/cli) to the IronWorker service that makes working with the service a lot easier and more convenient. It does, however, require you to have Ruby 1.9+ installed and to install the `iron_worker_ng` gem. Once Ruby 1.9+ is installed, you can just run the following command to get the gem:
+
+```bash
+$ gem install iron_worker_ng
 ```
 
-Every code package needs a name (which we specified above by passing it to the constructor, but we could have just as easily set it with `code.name = "WorkerName"`) and an executable (which we set using `code.executable` above, but could have just as easily passed it to the constructor). The executable is just the file you want the worker to run; it is the entry point for your code, the file you would execute if you were going to run the worker on your own machine.
+### Create Your .worker File
 
-iron_worker_python tries to react intelligently to your input; in the example above, it would have noticed that there is only one file in the CodePackage, and would have set it to be the executable. You should not rely on this, however; it's recommended that you always set the executable manually.
- 
-Once you have a CodePackage, you need to upload it using the API.
+.worker files are a simple way to define your worker and its dependencies. Save the following in a file called `HelloWorld.worker`:
 
-```python
-worker = IronWorker() # Instantiate the API
-worker.upload(code) # upload the CodePackage
+```ruby
+# set the runtime language; this should be "python" for Python workers
+runtime "python"
+# exec is the file that will be executed when you queue a task
+exec "hello.py"
 ```
 
-Note that, for brevity, you can build simple CodePackages and upload them all in one step:
+### Upload the Worker
 
-```python
-worker = IronWorker() # Instantiate the API
-worker.upload(target="/path/to/file/or/dir", name="WorkerName", executable="/path/to/executable")
-```
-
-This will create a CodePackage, merge in the target, set the name to "WorkerName", and set the executable to "/path/to/executable".
+Once you have your configuration file, your .worker file, and the gem in place, you can run `iron_worker upload HelloWorld` (if your .worker file is named HelloWorld.worker) to upload your worker.
 
 ## Queueing a Task
 
