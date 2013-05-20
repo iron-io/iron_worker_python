@@ -184,19 +184,19 @@ class CodePackage:
 
     def merge_dependency(self, dep):
         dependency = __import__(dep)
-	location = os.path.dirname(dependency.__file__)
-	print location
-	parent = location.rstrip(os.path.basename(location))
-	print parent
-	for dirname, dirnames, filenames in os.walk(location):
-	    for filename in filenames:
-	        path = os.path.join(dirname, filename)
-		if path.startswith(parent):
-		    newpath = path[len(parent):]
-		else:
-		    newpath = path
-		ziploc = newpath.lstrip("/")
-		self.files[ziploc] = path
+    location = os.path.dirname(dependency.__file__)
+    print location
+    parent = location.rstrip(os.path.basename(location))
+    print parent
+    for dirname, dirnames, filenames in os.walk(location):
+        for filename in filenames:
+            path = os.path.join(dirname, filename)
+        if path.startswith(parent):
+            newpath = path[len(parent):]
+        else:
+            newpath = path
+        ziploc = newpath.lstrip("/")
+        self.files[ziploc] = path
 
     def zip(self, destination=None, overwrite=True):
         if destination is None:
@@ -391,15 +391,15 @@ class IronWorker:
                 if task.run_every is not None:
                     task_data["run_every"] = task.run_every
                 if task.end_at is not None:
-		    if task.end_at.tzinfo is None:
-		        task.end_at = task.end_at.replace(tzinfo=tzlocal())
+            if task.end_at.tzinfo is None:
+                task.end_at = task.end_at.replace(tzinfo=tzlocal())
                     task_data["end_at"] = iron_core.IronClient.toRfc3339(
                             task.end_at)
                 if task.run_times is not None:
                     task_data["run_times"] = task.run_times
                 if task.start_at is not None:
-		    if task.start_at.tzinfo is None:
-		        task.start_at = task.start_at.replace(tzinfo=tzlocal())
+            if task.start_at.tzinfo is None:
+                task.start_at = task.start_at.replace(tzinfo=tzlocal())
                     task_data["start_at"] = iron_core.IronClient.toRfc3339(
                             task.start_at)
             tasks_data.append(task_data)
