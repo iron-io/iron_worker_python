@@ -1,4 +1,8 @@
 from setuptools import setup
+import sys
+python3_setup = {}
+if sys.version_info >= (3,):
+        python3_setup['use_2to3'] = True
 
 setup(
         name='iron-worker',
@@ -34,5 +38,6 @@ and more.
 
 IronWorker is a background processing and task queuing system that lets your 
 applications use the cloud to do their heavy lifting. Find out more at 
-http://www.iron.io/products/worker."""
+http://www.iron.io/products/worker.""",
+        **python3_setup
 )
