@@ -1,5 +1,5 @@
 from setuptools import setup
-
+import sys
 python3_setup = {}
 if sys.version_info >= (3,):
         python3_setup['use_2to3'] = True
