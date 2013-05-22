@@ -1,5 +1,9 @@
 import os
-import httplib
+import sys
+if sys.version_info >= (3,):
+    import http.client
+else:
+    import httplib
 import mimetypes
 import zipfile
 import time
@@ -16,7 +20,7 @@ def file_exists(file):
     if not os.path.exists(file):
         return False
     try:
-        open(file)
+        open(file).close()
     except IOError:
         return False
     return True
@@ -78,18 +82,26 @@ class Task:
 
     def __set(self, attr, value):
         if attr in self.__rfc3339_attrs:
-            if isinstance(value, basestring):
-                value = iron_core.IronClient.fromRfc3339(value)
+            if sys.version_info >= (3,):
+                if isinstance(value, str):
+                    value = iron_core.IronClient.fromRfc3339(value)
+            else:
+                if isinstance(value, basestring):
+                    value = iron_core.IronClient.fromRfc3339(value)
         if attr in self.__schedule_attrs:
             self.scheduled = True
         if attr in self.__repeating_attrs:
             self.repeating = True
         if attr in self.__json_attrs:
-            if isinstance(value, basestring):
-                try:
-                    value = json.loads(value)
-                except:
-                    pass
+            try:
+                if sys.version_info >= (3,):
+                    if isinstance(value, str):
+                        value = json.loads(value)
+                else:
+                    if isinstance(value, basestring):
+                        value = json.loads(value)
+            except:
+                pass
         setattr(self, attr, value)
 
     def __init__(self, values=None, **kwargs):
@@ -179,15 +191,17 @@ class CodePackage:
         else:
             raise ValueError("'%s' is not a file or directory." % target)
         if len(self.files) == 1:
-            for dest, loc in self.files.iteritems():
+            for dest, loc in self.files.items():
                 self.executable = dest
 
     def merge_dependency(self, dep):
         dependency = __import__(dep)
         location = os.path.dirname(dependency.__file__)
-        print location
+        sys.stdout.write(str(location))
+
         parent = location.rstrip(os.path.basename(location))
-        print parent
+        sys.stdout.write(str(parent))
+
         for dirname, dirnames, filenames in os.walk(location):
             for filename in filenames:
                 path = os.path.join(dirname, filename)
@@ -372,8 +386,12 @@ class IronWorker:
             tasks = [task]
         for task in tasks:
             payload = task.payload
-            if not isinstance(payload, basestring):
-                payload = json.dumps(payload)
+            if sys.version_info >= (3,):
+                if not isinstance(payload, str):
+                    payload = json.dumps(payload)
+            else:
+                if not isinstance(payload, basestring):
+                    payload = json.dumps(payload)
             if task.code_name is None:
                 raise ValueError("task.code_name is required.")
             task_data = {
@@ -469,7 +487,7 @@ class IronWorker:
             L.append('--' + BOUNDARY)
             L.append('Content-Disposition: form-data; name="%s"' % key)
             L.append('')
-            L.append(value)
+            L.append(str(value))
         for (key, filename, value) in files:
             L.append('--' + BOUNDARY)
             L.append('Content-Disposition: form-data; name="%s"; filename="%s"'
@@ -477,9 +495,10 @@ class IronWorker:
             L.append('Content-Type: %s'
                     % IronWorker.get_content_type(filename))
             L.append('')
-            L.append(value)
+            L.append(str(value))
         L.append('--' + BOUNDARY + '--')
         L.append('')
+
         body = CRLF.join(L)
         content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
         return content_type, str(body)
