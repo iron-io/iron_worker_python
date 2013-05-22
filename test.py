@@ -61,16 +61,18 @@ class TestIronWorker(unittest.TestCase):
         self.assertEqual(task_id, task.id)
 
     def test_zcancelTask(self):
+        time.sleep(2)
         tasks = self.worker.tasks()
-
         for task in tasks:
             self.worker.cancel(task)
 
+        time.sleep(3)
         new_tasks = self.worker.tasks()
         real_tasks = []
         for task in new_tasks:
-            if task.status not in ['cancelled', 'error']:
+            if task.status not in ['cancelled', 'error', 'killed']:
                 real_tasks.append(task)
+
         self.assertEqual(len(real_tasks), 0)
 
     def test_postSchedule(self):

@@ -1,11 +1,16 @@
 from setuptools import setup
+import sys
+
+python3_setup = {}
+if sys.version_info >= (3,):
+        python3_setup['use_2to3'] = True
 
 setup(
         name='iron-worker',
         py_modules=["iron_worker"],
 	packages=["testDir"],
-        version='1.2.0',
-        install_requires=["iron_core", "python-dateutil"],
+        version='1.3.0',
+        install_requires=["iron_core >= 1.1.0", "python-dateutil"],
         description='The Python client for IronWorker, a cloud service for background processing.',
         author='Iron.io',
         author_email="support@iron.io",
@@ -34,5 +39,6 @@ and more.
 
 IronWorker is a background processing and task queuing system that lets your 
 applications use the cloud to do their heavy lifting. Find out more at 
-http://www.iron.io/products/worker."""
+http://www.iron.io/products/worker.""",
+        **python3_setup
 )
