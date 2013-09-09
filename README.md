@@ -199,7 +199,7 @@ payload = None
 payload_file = None
 for i in range(len(sys.argv)):
     if sys.argv[i] == "-payload" and (i + 1) < len(sys.argv):
-        payload_file = sys.argv[i]
+        payload_file = sys.argv[i+1]
         break
 
 f = open(payload_file, "r")
