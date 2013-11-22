@@ -132,6 +132,7 @@ task.payload = {
     "best_song_ever": "Call Me Maybe"
 }
 task.run_every = 300 # The task will run every 300 seconds (5 minutes)
+task.scheduled = True
 response = worker.queue(task)
 ```
 
@@ -140,6 +141,7 @@ Likewise, if you'd like to run a task at a specific time, doing so is easy. Just
 ```python
 task = Task(code_name="HelloFuture")
 task.start_at = datetime.now() + timedelta(hours=1) # start in an hour
+task.scheduled = True
 response = worker.queue(task)
 ```
 
