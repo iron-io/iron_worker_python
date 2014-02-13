@@ -75,6 +75,29 @@ class TestIronWorker(unittest.TestCase):
 
         self.assertEqual(len(real_tasks), 0)
 
+    def test_setTaskProgress(self):
+        payload = {
+                "dict": {"a": 1, "b": 2},
+                "var": "alpha",
+                "list": ['apples', 'oranges', 'bananas']
+        }
+        resp = self.worker.queue(code_name=self.code_name, payload=payload)
+        task_id = resp.id
+        res = self.worker.setProgress(task_id, 50, 'Job half-done');
+        self.assertEqual(res["msg"], 'Progress set');    
+        
+    def test_setRetryTask(self):
+        payload = {
+                "dict": {"a": 1, "b": 2},
+                "var": "alpha",
+                "list": ['apples', 'oranges', 'bananas']
+        }
+        resp = self.worker.queue(code_name=self.code_name, payload=payload)
+        task_id = resp.id
+        res = self.worker.retry(task_id, 10);
+                
+        self.assertEqual(res["msg"], "Queued up");
+
     def test_postSchedule(self):
         resp = self.worker.queue(code_name=self.code_name, delay=120)
 
