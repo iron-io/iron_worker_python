@@ -145,6 +145,8 @@ task.scheduled = True
 response = worker.queue(task)
 ```
 
+## Setting Task Priority
+
 You can specify priority of the task using `priority` field:
 
 ```python
