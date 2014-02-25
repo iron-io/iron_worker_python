@@ -145,6 +145,16 @@ task.scheduled = True
 response = worker.queue(task)
 ```
 
+You can specify priority of the task using `priority` field:
+
+```python
+task.priority = 0 # default value, lowest priority
+task.priority = 1 # medium priority
+task.priority = 2 # high priority
+```
+
+Value of priority field means the priority queue to run the task in. Valid values are 0, 1, and 2. 0 is the default.
+
 ## Status of a Worker
 To get the status of a worker, you can use the `worker.task` method.
 
