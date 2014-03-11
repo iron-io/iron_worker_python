@@ -457,6 +457,29 @@ class IronWorker:
         headers = {"Accept": "text/plain"}
         resp = self.client.get(url, headers=headers)
         return resp["body"]
+	
+    def setProgress(self, id, percent, msg=''):
+        if isinstance(id, Task):
+            id = id.id
+        url = "tasks/%s/progress" % id
+	body = {}
+	body['percent'] = percent
+	body['msg'] = msg
+        body = json.dumps(body)
+	resp = self.client.post(url, body=body,
+                                    headers={"Content-Type":"application/json"})
+        return resp["body"]
+		
+    def retry(self, id, delay=1):
+        if isinstance(id, Task):
+            id = id.id
+        url = "tasks/%s/retry" % id
+	body = {}
+        body['delay'] = delay
+        body = json.dumps(body)
+	resp = self.client.post(url, body=body,
+                                    headers={"Content-Type":"application/json"})
+        return resp["body"]
 
     def cancel(self, id, scheduled=False):
         if isinstance(id, Task):
