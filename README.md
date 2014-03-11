@@ -223,6 +223,29 @@ f.close()
 payload = json.loads(contents)
 ```
 
+## Queueing a task from another task
+
+If you need to run slave task from master task you should add two more lines to master worker file:
+
+MasterTask
+
+```ruby
+runtime "python"
+exec "master_task.py"
+
+# install iron_worker on the server side
+pip 'iron_worker'
+remote
+```
+
+After it you can call your uploaded task from code:
+
+```python
+from iron_worker import *
+worker = IronWorker(project_id=your_project_id, token=your_project_token)
+task = worker.queue(code_name="SlaveTask")
+```
+
 # Full Documentation
 
 You can find more documentation here:
