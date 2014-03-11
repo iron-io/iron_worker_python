@@ -145,6 +145,18 @@ task.scheduled = True
 response = worker.queue(task)
 ```
 
+## Setting Task Priority
+
+You can specify priority of the task using `priority` field:
+
+```python
+task.priority = 0 # default value, lowest priority
+task.priority = 1 # medium priority
+task.priority = 2 # high priority
+```
+
+Value of priority field means the priority queue to run the task in. Valid values are 0, 1, and 2. 0 is the default.
+
 ## Status of a Worker
 To get the status of a worker, you can use the `worker.task` method.
 
@@ -209,6 +221,29 @@ contents = f.read()
 f.close()
 
 payload = json.loads(contents)
+```
+
+## Queueing a task from another task
+
+If you need to run slave task from master task you should add two more lines to master worker file:
+
+```ruby
+# MasterTask.worker
+
+runtime "python"
+exec "master_task.py"
+
+# install iron_worker on the server side
+pip 'iron_worker'
+remote
+```
+
+After it you can call your uploaded task from code:
+
+```python
+from iron_worker import *
+worker = IronWorker(project_id=your_project_id, token=your_project_token)
+task = worker.queue(code_name="SlaveTask")
 ```
 
 # Full Documentation
