@@ -227,9 +227,9 @@ payload = json.loads(contents)
 
 If you need to run slave task from master task you should add two more lines to master worker file:
 
-MasterTask
-
 ```ruby
+# MasterTask.worker
+
 runtime "python"
 exec "master_task.py"
 
