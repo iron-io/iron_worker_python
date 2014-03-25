@@ -1,4 +1,5 @@
 import json
+import iron_core
 
 canned_tasks = '''{
     "tasks": [
@@ -62,6 +63,11 @@ canned_data = {
     'schedules': dict(body=json.loads(canned_shedules))
 }
 
+class FakeIronClient(iron_core.IronClient):
+    '''Monkey-patches the iron_client.__init__ so that the logon can be bypassed'''
+    def __init__(self, *args, **kwargs):
+        pass
+
 def stub(*args, **kwargs):
     '''Provides a indirect input to the system under test
     http://xunitpatterns.com/Test%20Stub.html
@@ -75,14 +81,8 @@ def spy(*args, **kwargs):
     spy.data = args
     return stub(*args, **kwargs)
     
-import iron_core
-class FakeIronClient(iron_core.IronClient):
-    '''Monkey-patches the iron_client.__init__ so that the logon can be bypassed'''
-    def __init__(self, *args, **kwargs):
-        pass
-
 def remove_spy_data():
     if hasattr(spy,'data'):
         del spy.data
 
-__all__ = [stub.__name__, spy.__name__, FakeIronClient.__name__, remove_spy_data.__name__]
+__all__ = [FakeIronClient.__name__, stub.__name__, spy.__name__, remove_spy_data.__name__]

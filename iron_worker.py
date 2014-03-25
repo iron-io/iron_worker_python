@@ -368,7 +368,7 @@ class IronWorker:
 
         Keyword arguments:
         scheduled -- Lists only tasks that run on a schedule. See http://dev.iron.io/worker/reference/api/#list_scheduled_tasks for details.
-        conde_name -- Lists only tasks with the specified code_name. See http://dev.iron.io/worker/reference/api/#list_code_packages for details.
+        conde_name -- Lists only tasks with the specified code_name. See http://dev.iron.io/worker/reference/api/#list_tasks for details.
         '''
         tasks = []
         if not scheduled:

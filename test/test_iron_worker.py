@@ -67,3 +67,5 @@ def test_iron_worker_call_for_scheduled_tasks_with_filter():
     worker.client.get = spy
     scheduled_tasks = worker.tasks(scheduled=1, code_name="MyWorker")
     assert_equal(len(scheduled_tasks), ONLY_ONE)
+    task = scheduled_tasks[0]
+    assert_equal(task.code_name, 'MyWorker')
