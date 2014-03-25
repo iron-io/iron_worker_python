@@ -363,10 +363,19 @@ class IronWorker:
     #############################################################
     ########################## TASKS ############################
     #############################################################
-    def tasks(self, scheduled=False):
+    def tasks(self, scheduled=False, code_name=""):
+        '''Lists all tasks for the current project.
+
+        Keyword arguments:
+        scheduled -- Lists only tasks that run on a schedule. See http://dev.iron.io/worker/reference/api/#list_scheduled_tasks for details.
+        conde_name -- Lists only tasks with the specified code_name. See http://dev.iron.io/worker/reference/api/#list_code_packages for details.
+        '''
         tasks = []
         if not scheduled:
-            resp = self.client.get("tasks")
+            url = "tasks"
+            if code_name: 
+                url = "{url}?code_name={code_name}".format(url=url, code_name=code_name)
+            resp = self.client.get(url)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["tasks"]
         else:
@@ -375,7 +384,10 @@ class IronWorker:
             raw_tasks = raw_tasks["schedules"]
 
         for raw_task in raw_tasks:
+            if code_name and raw_task['code_name'] != code_name:
+                continue
             tasks.append(Task(raw_task))
+
         return tasks
 
     def queue(self, task=None, tasks=None, retry=None, **kwargs):
