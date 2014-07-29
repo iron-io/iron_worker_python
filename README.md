@@ -121,6 +121,13 @@ task.delay = 300 # start this task in 300 seconds (5 minutes)
 response = worker.queue(task)
 ```
 
+### Task Options
+
+  - **priority**: Setting the priority of your job. Valid values are 0, 1, and 2. The default is 0.
+  - **timeout**: The maximum runtime of your task in seconds. No task can exceed 3600 seconds (60 minutes). The default is 3600 but can be set to a shorter duration.
+  - **delay**: The number of seconds to delay before actually queuing the task. Default is 0.
+
+
 ## Scheduling a Task
 
 If you'd like to run a task at a specific time, or set a task to be run repeatedly, you want to create a [scheduled task](http://dev.iron.io/worker/scheduling). Unlike previous versions of iron_worker_python, we've unified tasks and scheduled tasks into the same interface. iron_worker_python will automatically detect when you want to create a scheduled task and react accordingly.
@@ -144,6 +151,15 @@ task.start_at = datetime.now() + timedelta(hours=1) # start in an hour
 task.scheduled = True
 response = worker.queue(task)
 ```
+
+### Scheduling Options
+
+  - **run_every**: The amount of time, in seconds, between runs. By default, the task will only run once. run_every will return a 400 error if it is set to less than 60.
+  - **end_at**: The time tasks will stop being queued. Should be an instance `datetime.datetime`.
+  - **run_times**: The number of times a task will run.
+  - **priority**: Setting the priority of your job. Valid values are 0, 1, and 2. The default is 0. Higher values means tasks spend less time in the queue once they come off the schedule.
+  - **start_at**: The time the scheduled task should first be run. Should be an instance `datetime.datetime`.
+
 
 ## Setting Task Priority
 
