@@ -381,8 +381,7 @@ class IronWorker:
     def tasks_by_code_name(self, code_name):
         tasks = []
         resp = self.client.get("tasks?code_name=%s" % code_name)
-        raw_tasks = resp["body"]
-        raw_tasks = raw_tasks["tasks"]
+        raw_tasks = resp["body"]["tasks"]
         for raw_task in raw_tasks:
            tasks.append(Task(raw_task))
         return tasks
