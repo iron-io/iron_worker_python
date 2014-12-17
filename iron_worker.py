@@ -52,6 +52,7 @@ class Task:
     percent = None
     payload = None
     priority = 0
+    label = None
 
     scheduled = False
     repeating = False
@@ -407,7 +408,8 @@ class IronWorker:
                     "code_name": task.code_name,
                     "payload": payload,
                     "priority": task.priority,
-                    "delay": task.delay
+                    "delay": task.delay,
+                    "label": task.label
             }
             if not task.scheduled:
                 type_str = "tasks"

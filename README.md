@@ -126,6 +126,7 @@ response = worker.queue(task)
   - **priority**: Setting the priority of your job. Valid values are 0, 1, and 2. The default is 0.
   - **timeout**: The maximum runtime of your task in seconds. No task can exceed 3600 seconds (60 minutes). The default is 3600 but can be set to a shorter duration.
   - **delay**: The number of seconds to delay before actually queuing the task. Default is 0.
+  - **label**: Optional text label for your task. 
 
 
 ## Scheduling a Task
