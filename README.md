@@ -141,6 +141,7 @@ task.payload = {
 }
 task.run_every = 300 # The task will run every 300 seconds (5 minutes)
 task.scheduled = True
+task.label = "custom_label"
 response = worker.queue(task)
 ```
 
@@ -160,7 +161,7 @@ response = worker.queue(task)
   - **run_times**: The number of times a task will run.
   - **priority**: Setting the priority of your job. Valid values are 0, 1, and 2. The default is 0. Higher values means tasks spend less time in the queue once they come off the schedule.
   - **start_at**: The time the scheduled task should first be run. Should be an instance `datetime.datetime`.
-
+  - **label**: Optional label for adding custom labels to scheduled tasks.
 
 ## Setting Task Priority
 

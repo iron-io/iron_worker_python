@@ -430,6 +430,7 @@ class IronWorker:
                         task.start_at = task.start_at.replace(tzinfo=tzlocal())
                     task_data["start_at"] = iron_core.IronClient.toRfc3339(
                             task.start_at)
+                task_data["label"] = task.label
             tasks_data.append(task_data)
         data = json.dumps({type_str: tasks_data})
         headers = {"Content-Type": "application/json"}
