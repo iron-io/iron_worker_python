@@ -53,6 +53,7 @@ class Task:
     payload = None
     priority = 0
     label = None
+    cluster = None
 
     scheduled = False
     repeating = False
@@ -409,7 +410,8 @@ class IronWorker:
                     "payload": payload,
                     "priority": task.priority,
                     "delay": task.delay,
-                    "label": task.label
+                    "label": task.label,
+                    "cluster": task.cluster
             }
             if not task.scheduled:
                 type_str = "tasks"
@@ -431,6 +433,7 @@ class IronWorker:
                     task_data["start_at"] = iron_core.IronClient.toRfc3339(
                             task.start_at)
                 task_data["label"] = task.label
+                task_data["cluster"] = task.cluster
             tasks_data.append(task_data)
         data = json.dumps({type_str: tasks_data})
         headers = {"Content-Type": "application/json"}
