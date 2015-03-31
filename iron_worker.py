@@ -31,6 +31,7 @@ class Task:
     project = None
     code_id = None
     code_history_id = None
+    schedule_id = None
     status = None
     code_name = None
     code_rev = None
