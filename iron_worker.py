@@ -238,7 +238,7 @@ class CodePackage:
 
 class IronWorker:
     NAME = "iron_worker_python"
-    VERSION = "1.2.0"
+    VERSION = "1.3.0"
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
@@ -544,3 +544,40 @@ class IronWorker:
     @staticmethod
     def get_content_type(filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+    def get_args(self):
+        global args
+        args = {'task_id': None, 'dir': None, 'payload': [], 'config': None}
+
+        for i in range(len(sys.argv)):
+            if sys.argv[i] == "-id":
+                args['task_id'] = sys.argv[i + 1]
+            if sys.argv[i] == "-d":
+                args['dir'] = sys.argv[i + 1]
+            if sys.argv[i] == "-payload":
+                args['payload_file'] = sys.argv[i + 1]
+            if sys.argv[i] == "-config":
+                args['config_file'] = sys.argv[i + 1]
+        
+        if os.getenv('TASK_ID') != None: args['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR') != None: args['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE') != None: args['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE') != None: args['config_file'] = os.getenv('CONFIG_FILE')
+
+        if args.has_key('payload_file') and file_exists(args['payload_file']):
+            f = open(args['payload_file'], "r")
+            contents = f.read()
+            f.close()
+            args['payload'] = json.loads(contents)
+
+        if args.has_key('config_file') and file_exists(args['config_file']):
+            f = open(args['config_file'], "r")
+            contents = f.read()
+            f.close()
+            args['config'] = json.loads(contents)
+
+        return args
+
+
+
+
