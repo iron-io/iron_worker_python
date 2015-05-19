@@ -577,7 +577,3 @@ class IronWorker:
             args['config'] = json.loads(contents)
 
         return args
-
-
-
-
