@@ -239,6 +239,9 @@ class CodePackage:
 class IronWorker:
     NAME = "iron_worker_python"
     VERSION = "1.3.0"
+    
+    __loaded = False
+    __args = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
@@ -248,43 +251,43 @@ class IronWorker:
         self.client = iron_core.IronClient(name=IronWorker.NAME,
                 version=IronWorker.VERSION, product="iron_worker", **kwargs)
 
-    def __get_args(self):
-        args = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
+    def __load_args(self):
+        if self.__loaded: return        
 
         for i in range(len(sys.argv)):
             if sys.argv[i] == "-id":
-                args['task_id'] = sys.argv[i + 1]
+                self.__args['task_id'] = sys.argv[i + 1]
             if sys.argv[i] == "-d":
-                args['dir'] = sys.argv[i + 1]
+                self.__args['dir'] = sys.argv[i + 1]
             if sys.argv[i] == "-payload":
-                args['payload_file'] = sys.argv[i + 1]
+                self.__args['payload_file'] = sys.argv[i + 1]
             if sys.argv[i] == "-config":
-                args['config_file'] = sys.argv[i + 1]
+                self.__args['config_file'] = sys.argv[i + 1]
         
-        if os.getenv('TASK_ID'): args['task_id'] = os.getenv('TASK_ID')
-        if os.getenv('TASK_DIR'): args['dir'] = os.getenv('TASK_DIR')
-        if os.getenv('PAYLOAD_FILE'): args['payload_file'] = os.getenv('PAYLOAD_FILE')
-        if os.getenv('CONFIG_FILE'): args['config_file'] = os.getenv('CONFIG_FILE')
+        if os.getenv('TASK_ID'): self.__args['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR'): self.__args['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE'): self.__args['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE'): self.__args['config_file'] = os.getenv('CONFIG_FILE')
 
-        if 'payload_file' in args and file_exists(args['payload_file']):
-	    f = open(args['payload_file'], "r")
+        if 'payload_file' in self.__args and file_exists(self.__args['payload_file']):
+	    f = open(self.__args['payload_file'], "r")
             try:
                 content = f.read()
                 f.close()
-                args['payload'] = json.loads(content)
+                self.__args['payload'] = json.loads(content)
             except Exception, e:
                 print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
 
-        if 'config_file' in args and file_exists(args['config_file']):
-            f = open(args['config_file'])
+        if 'config_file' in self.__args and file_exists(self.__args['config_file']):
+            f = open(self.__args['config_file'])
             try:
                 content = f.read()
                 f.close()
-                args['config'] = json.loads(content)
+                self.__args['config'] = json.loads(content)
             except Exception, e:
                 print "Couldn't parse IronWorker config into json. %s" % e
 
-        return args
+        self.__loaded = True
 
     #############################################################
     ####################### CODE PACKAGES #######################
@@ -546,23 +549,27 @@ class IronWorker:
         return True
 
     def payload(self):
-        args = self.__get_args()
-        return args['payload']
+        self.__load_args()
+        return self.__args['payload']
 
     def config(self):
-        args = self.__get_args()
-        return args['config']
+        self.__load_args()
+        return self.__args['config']
 
     def task_id(self):
-        args = self.__get_args()
-        return args['task_id']
+        self.__load_args()
+        return self.__args['task_id']
 
     def task_dir(self):
-        args = self.__get_args()
-        return args['dir']
+        self.__load_args()
+        return self.__args['dir']
 
     def args(self):
-        return self.__get_args()
+        self.__load_args()
+        return self.__args
+
+    def loaded(self):
+        return self.__loaded
 
     #############################################################
     ######################### HELPERS ###########################
