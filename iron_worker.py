@@ -238,7 +238,10 @@ class CodePackage:
 
 class IronWorker:
     NAME = "iron_worker_python"
-    VERSION = "1.2.0"
+    VERSION = "1.3.0"
+    
+    __loaded = False
+    __args = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
@@ -247,6 +250,44 @@ class IronWorker:
         documentation for a full list and possible values."""
         self.client = iron_core.IronClient(name=IronWorker.NAME,
                 version=IronWorker.VERSION, product="iron_worker", **kwargs)
+
+    def __load_args(self):
+        if self.__loaded: return        
+
+        for i in range(len(sys.argv)):
+            if sys.argv[i] == "-id":
+                self.__args['task_id'] = sys.argv[i + 1]
+            if sys.argv[i] == "-d":
+                self.__args['dir'] = sys.argv[i + 1]
+            if sys.argv[i] == "-payload":
+                self.__args['payload_file'] = sys.argv[i + 1]
+            if sys.argv[i] == "-config":
+                self.__args['config_file'] = sys.argv[i + 1]
+        
+        if os.getenv('TASK_ID'): self.__args['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR'): self.__args['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE'): self.__args['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE'): self.__args['config_file'] = os.getenv('CONFIG_FILE')
+
+        if 'payload_file' in self.__args and file_exists(self.__args['payload_file']):
+	    f = open(self.__args['payload_file'], "r")
+            try:
+                content = f.read()
+                f.close()
+                self.__args['payload'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+
+        if 'config_file' in self.__args and file_exists(self.__args['config_file']):
+            f = open(self.__args['config_file'])
+            try:
+                content = f.read()
+                f.close()
+                self.__args['config'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker config into json. %s" % e
+
+        self.__loaded = True
 
     #############################################################
     ####################### CODE PACKAGES #######################
@@ -506,6 +547,29 @@ class IronWorker:
             url = "schedules/%s/cancel" % id
         resp = self.client.post(url)
         return True
+
+    def payload(self):
+        self.__load_args()
+        return self.__args['payload']
+
+    def config(self):
+        self.__load_args()
+        return self.__args['config']
+
+    def task_id(self):
+        self.__load_args()
+        return self.__args['task_id']
+
+    def task_dir(self):
+        self.__load_args()
+        return self.__args['dir']
+
+    def args(self):
+        self.__load_args()
+        return self.__args
+
+    def loaded(self):
+        return self.__loaded
 
     #############################################################
     ######################### HELPERS ###########################
