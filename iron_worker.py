@@ -248,6 +248,44 @@ class IronWorker:
         self.client = iron_core.IronClient(name=IronWorker.NAME,
                 version=IronWorker.VERSION, product="iron_worker", **kwargs)
 
+    def __get_args(self):
+        args = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
+
+        for i in range(len(sys.argv)):
+            if sys.argv[i] == "-id":
+                args['task_id'] = sys.argv[i + 1]
+            if sys.argv[i] == "-d":
+                args['dir'] = sys.argv[i + 1]
+            if sys.argv[i] == "-payload":
+                args['payload_file'] = sys.argv[i + 1]
+            if sys.argv[i] == "-config":
+                args['config_file'] = sys.argv[i + 1]
+        
+        if os.getenv('TASK_ID'): args['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR'): args['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE'): args['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE'): args['config_file'] = os.getenv('CONFIG_FILE')
+
+        if 'payload_file' in args and file_exists(args['payload_file']):
+	    f = open(args['payload_file'], "r")
+            try:
+                content = f.read()
+                f.close()
+                args['payload'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+
+        if 'config_file' in args and file_exists(args['config_file']):
+            f = open(args['config_file'])
+            try:
+                content = f.read()
+                f.close()
+                args['config'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker config into json. %s" % e
+
+        return args
+
     #############################################################
     ####################### CODE PACKAGES #######################
     #############################################################
@@ -507,6 +545,25 @@ class IronWorker:
         resp = self.client.post(url)
         return True
 
+    def payload(self):
+        args = self.__get_args()
+        return args['payload']
+
+    def config(self):
+        args = self.__get_args()
+        return args['config']
+
+    def task_id(self):
+        args = self.__get_args()
+        return args['task_id']
+
+    def task_dir(self):
+        args = self.__get_args()
+        return args['dir']
+
+    def args(self):
+        return self.__get_args()
+
     #############################################################
     ######################### HELPERS ###########################
     #############################################################
@@ -544,36 +601,3 @@ class IronWorker:
     @staticmethod
     def get_content_type(filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
-
-    def get_args(self):
-        global args
-        args = {'task_id': None, 'dir': None, 'payload': [], 'config': None}
-
-        for i in range(len(sys.argv)):
-            if sys.argv[i] == "-id":
-                args['task_id'] = sys.argv[i + 1]
-            if sys.argv[i] == "-d":
-                args['dir'] = sys.argv[i + 1]
-            if sys.argv[i] == "-payload":
-                args['payload_file'] = sys.argv[i + 1]
-            if sys.argv[i] == "-config":
-                args['config_file'] = sys.argv[i + 1]
-        
-        if os.getenv('TASK_ID') != None: args['task_id'] = os.getenv('TASK_ID')
-        if os.getenv('TASK_DIR') != None: args['dir'] = os.getenv('TASK_DIR')
-        if os.getenv('PAYLOAD_FILE') != None: args['payload_file'] = os.getenv('PAYLOAD_FILE')
-        if os.getenv('CONFIG_FILE') != None: args['config_file'] = os.getenv('CONFIG_FILE')
-
-        if args.has_key('payload_file') and file_exists(args['payload_file']):
-            f = open(args['payload_file'], "r")
-            contents = f.read()
-            f.close()
-            args['payload'] = json.loads(contents)
-
-        if args.has_key('config_file') and file_exists(args['config_file']):
-            f = open(args['config_file'], "r")
-            contents = f.read()
-            f.close()
-            args['config'] = json.loads(contents)
-
-        return args
