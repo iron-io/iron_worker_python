@@ -249,45 +249,7 @@ class IronWorker:
         Keyword arguments are passed directly to iron_core_python; consult its
         documentation for a full list and possible values."""
         self.client = iron_core.IronClient(name=IronWorker.NAME,
-                version=IronWorker.VERSION, product="iron_worker", **kwargs)
-
-    def __load_args(self):
-        if self.__loaded: return        
-
-        for i in range(len(sys.argv)):
-            if sys.argv[i] == "-id":
-                self.__args['task_id'] = sys.argv[i + 1]
-            if sys.argv[i] == "-d":
-                self.__args['dir'] = sys.argv[i + 1]
-            if sys.argv[i] == "-payload":
-                self.__args['payload_file'] = sys.argv[i + 1]
-            if sys.argv[i] == "-config":
-                self.__args['config_file'] = sys.argv[i + 1]
-        
-        if os.getenv('TASK_ID'): self.__args['task_id'] = os.getenv('TASK_ID')
-        if os.getenv('TASK_DIR'): self.__args['dir'] = os.getenv('TASK_DIR')
-        if os.getenv('PAYLOAD_FILE'): self.__args['payload_file'] = os.getenv('PAYLOAD_FILE')
-        if os.getenv('CONFIG_FILE'): self.__args['config_file'] = os.getenv('CONFIG_FILE')
-
-        if 'payload_file' in self.__args and file_exists(self.__args['payload_file']):
-	    f = open(self.__args['payload_file'], "r")
-            try:
-                content = f.read()
-                f.close()
-                self.__args['payload'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
-
-        if 'config_file' in self.__args and file_exists(self.__args['config_file']):
-            f = open(self.__args['config_file'])
-            try:
-                content = f.read()
-                f.close()
-                self.__args['config'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker config into json. %s" % e
-
-        self.__loaded = True
+                version=IronWorker.VERSION, product="iron_worker", **kwargs)    
 
     #############################################################
     ####################### CODE PACKAGES #######################
@@ -548,29 +510,6 @@ class IronWorker:
         resp = self.client.post(url)
         return True
 
-    def payload(self):
-        self.__load_args()
-        return self.__args['payload']
-
-    def config(self):
-        self.__load_args()
-        return self.__args['config']
-
-    def task_id(self):
-        self.__load_args()
-        return self.__args['task_id']
-
-    def task_dir(self):
-        self.__load_args()
-        return self.__args['dir']
-
-    def args(self):
-        self.__load_args()
-        return self.__args
-
-    def loaded(self):
-        return self.__loaded
-
     #############################################################
     ######################### HELPERS ###########################
     #############################################################
@@ -608,3 +547,71 @@ class IronWorker:
     @staticmethod
     def get_content_type(filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+    @staticmethod
+    def __load_args():
+        if IronWorker.__loaded: return
+
+        for i in range(len(sys.argv)):
+            if sys.argv[i] == "-id":
+                IronWorker.__args['task_id'] = sys.argv[i + 1]
+            if sys.argv[i] == "-d":
+                IronWorker.__args['dir'] = sys.argv[i + 1]
+            if sys.argv[i] == "-payload":
+                IronWorker.__args['payload_file'] = sys.argv[i + 1]
+            if sys.argv[i] == "-config":
+                IronWorker.__args['config_file'] = sys.argv[i + 1]
+        
+        if os.getenv('TASK_ID'): IronWorker.__args['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR'): IronWorker.__args['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE'): IronWorker.__args['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE'): IronWorker.__args['config_file'] = os.getenv('CONFIG_FILE')
+
+        if 'payload_file' in IronWorker.__args and file_exists(IronWorker.__args['payload_file']):
+	    f = open(IronWorker.__args['payload_file'], "r")
+            try:
+                content = f.read()
+                f.close()
+                IronWorker.__args['payload'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+
+        if 'config_file' in IronWorker.__args and file_exists(IronWorker.__args['config_file']):
+            f = open(IronWorker.__args['config_file'])
+            try:
+                content = f.read()
+                f.close()
+                IronWorker.__args['config'] = json.loads(content)
+            except Exception, e:
+                print "Couldn't parse IronWorker config into json. %s" % e
+
+        IronWorker.__loaded = True
+
+    @staticmethod
+    def payload():
+        IronWorker.__load_args()
+        return IronWorker.__args['payload']
+    
+    @staticmethod
+    def config():
+        IronWorker.__load_args()
+        return IronWorker.__args['config']
+
+    @staticmethod
+    def task_id():
+        IronWorker.__load_args()
+        return IronWorker.__args['task_id']
+
+    @staticmethod
+    def task_dir():
+        IronWorker.__load_args()
+        return IronWorker.__args['dir']
+
+    @staticmethod
+    def args():
+        IronWorker.__load_args()
+        return IronWorker.__args
+
+    @staticmethod
+    def loaded():
+        return IronWorker.__loaded
