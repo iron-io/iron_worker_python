@@ -218,29 +218,17 @@ time.sleep(10)
 print worker.log(id=task.id)
 ```
 
-## Loading the Task Data Payload
+## IronWorker Helper Functions
 
-When your code is executed, it will be passed three program arguments:
-
-* **-id** - The task id.
-* **-payload** - the filename containing the data payload for this particular task.
-* **-d** - the user writable directory that can be used while running your job.
-
-Simply open the filename passed by `-payload`, read its contents, and (if you used iron_worker_python to queue the task), decode the string as JSON:
+These functions will help you read in worker payloads and things for when your worker is running. To use these functions include the 'iron_worker' package in your .worker file and then use the helper functions:
 
 ```python
-payload = None
-payload_file = None
-for i in range(len(sys.argv)):
-    if sys.argv[i] == "-payload" and (i + 1) < len(sys.argv):
-        payload_file = sys.argv[i + 1]
-        break
+from iron_worker import *
 
-f = open(payload_file, "r")
-contents = f.read()
-f.close()
-
-payload = json.loads(contents)
+print "Here is the payload: %s" % IronWorker.payload()
+print "Here is the config: %s" % IronWorker.config()
+print "Here is the tas id: %s" % IronWorker.task_id()
+print "Here is the task dir: %s" % IronWorker.task_dir()
 ```
 
 ## Queueing a task from another task
