@@ -240,8 +240,8 @@ class IronWorker:
     NAME = "iron_worker_python"
     VERSION = "1.3.0"
     
-    __loaded = False
-    __args = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
+    isLoaded = False
+    arguments = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
 
     def __init__(self, **kwargs):
         """Prepare a configured instance of the API wrapper and return it.
@@ -549,69 +549,69 @@ class IronWorker:
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
     @staticmethod
-    def __load_args():
-        if IronWorker.__loaded: return
+    def load_args():
+        if IronWorker.isLoaded: return
 
         for i in range(len(sys.argv)):
             if sys.argv[i] == "-id":
-                IronWorker.__args['task_id'] = sys.argv[i + 1]
+                IronWorker.arguments['task_id'] = sys.argv[i + 1]
             if sys.argv[i] == "-d":
-                IronWorker.__args['dir'] = sys.argv[i + 1]
+                IronWorker.arguments['dir'] = sys.argv[i + 1]
             if sys.argv[i] == "-payload":
-                IronWorker.__args['payload_file'] = sys.argv[i + 1]
+                IronWorker.arguments['payload_file'] = sys.argv[i + 1]
             if sys.argv[i] == "-config":
-                IronWorker.__args['config_file'] = sys.argv[i + 1]
+                IronWorker.arguments['config_file'] = sys.argv[i + 1]
         
-        if os.getenv('TASK_ID'): IronWorker.__args['task_id'] = os.getenv('TASK_ID')
-        if os.getenv('TASK_DIR'): IronWorker.__args['dir'] = os.getenv('TASK_DIR')
-        if os.getenv('PAYLOAD_FILE'): IronWorker.__args['payload_file'] = os.getenv('PAYLOAD_FILE')
-        if os.getenv('CONFIG_FILE'): IronWorker.__args['config_file'] = os.getenv('CONFIG_FILE')
+        if os.getenv('TASK_ID'): IronWorker.arguments['task_id'] = os.getenv('TASK_ID')
+        if os.getenv('TASK_DIR'): IronWorker.arguments['dir'] = os.getenv('TASK_DIR')
+        if os.getenv('PAYLOAD_FILE'): IronWorker.arguments['payload_file'] = os.getenv('PAYLOAD_FILE')
+        if os.getenv('CONFIG_FILE'): IronWorker.arguments['config_file'] = os.getenv('CONFIG_FILE')
 
-        if 'payload_file' in IronWorker.__args and file_exists(IronWorker.__args['payload_file']):
-	    f = open(IronWorker.__args['payload_file'], "r")
+        if 'payload_file' in IronWorker.arguments and file_exists(IronWorker.arguments['payload_file']):
+	    f = open(IronWorker.arguments['payload_file'], "r")
             try:
                 content = f.read()
                 f.close()
-                IronWorker.__args['payload'] = json.loads(content)
+                IronWorker.arguments['payload'] = json.loads(content)
             except Exception, e:
                 print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
 
-        if 'config_file' in IronWorker.__args and file_exists(IronWorker.__args['config_file']):
-            f = open(IronWorker.__args['config_file'])
+        if 'config_file' in IronWorker.arguments and file_exists(IronWorker.arguments['config_file']):
+            f = open(IronWorker.arguments['config_file'])
             try:
                 content = f.read()
                 f.close()
-                IronWorker.__args['config'] = json.loads(content)
+                IronWorker.arguments['config'] = json.loads(content)
             except Exception, e:
                 print "Couldn't parse IronWorker config into json. %s" % e
 
-        IronWorker.__loaded = True
+        IronWorker.isLoaded = True
 
     @staticmethod
     def payload():
-        IronWorker.__load_args()
-        return IronWorker.__args['payload']
+        IronWorker.load_args()
+        return IronWorker.arguments['payload']
     
     @staticmethod
     def config():
-        IronWorker.__load_args()
-        return IronWorker.__args['config']
+        IronWorker.load_args()
+        return IronWorker.arguments['config']
 
     @staticmethod
     def task_id():
-        IronWorker.__load_args()
-        return IronWorker.__args['task_id']
+        IronWorker.load_args()
+        return IronWorker.arguments['task_id']
 
     @staticmethod
     def task_dir():
-        IronWorker.__load_args()
-        return IronWorker.__args['dir']
+        IronWorker.load_args()
+        return IronWorker.arguments['dir']
 
     @staticmethod
     def args():
-        IronWorker.__load_args()
-        return IronWorker.__args
+        IronWorker.load_args()
+        return IronWorker.arguments
 
     @staticmethod
     def loaded():
-        return IronWorker.__loaded
+        return IronWorker.isLoaded

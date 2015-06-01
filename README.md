@@ -225,10 +225,10 @@ These functions will help you read in worker payloads and things for when your w
 ```python
 from iron_worker import *
 
-print "Here is the payload: %s"%IronWorker.payload()
-print "Here is the config: %s"%IronWorker.config()
-print "Here is the tas id: %s"%IronWorker.task_id()
-print "Here is the task dir: %s"%IronWorker.task_dir()
+print "Here is the payload: %s" % IronWorker.payload()
+print "Here is the config: %s" % IronWorker.config()
+print "Here is the tas id: %s" % IronWorker.task_id()
+print "Here is the task dir: %s" % IronWorker.task_dir()
 ```
 
 ## Queueing a task from another task
