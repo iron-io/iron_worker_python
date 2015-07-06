@@ -124,7 +124,7 @@ response = worker.queue(task)
 ### Task Options
 
   - **priority**: Setting the priority of your job. Valid values are 0, 1, and 2. The default is 0.
-  - **timeout**: The maximum runtime of your task in seconds. No task can exceed 3600 seconds (60 minutes). The default is 3600 but can be set to a shorter duration.
+  - **timeout**: The maximum runtime of your task in seconds. The default maxium runtime is 3600 seconds (60 minutes), it can be up to 24 hours for Enterprise plans. The default is 3600 but can be set to a different duration.
   - **delay**: The number of seconds to delay before actually queuing the task. Default is 0.
   - **label**: Optional text label for your task. 
   - **cluster**: cluster name ex: "high-mem" or "dedicated".  This is a premium feature for customers to have access to more powerful or custom built worker solutions. Dedicated worker clusters exist for users who want to reserve a set number of workers just for their queued tasks. If not set default is set to  "default" which is the public IronWorker cluster.
