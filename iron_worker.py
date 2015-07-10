@@ -370,7 +370,6 @@ class IronWorker:
     ########################## TASKS ############################
     #############################################################
     def tasks(self, scheduled=False, page=None, per_page=30):
-        tasks = []
         if not scheduled:
             resp = self.client.get("tasks")
             raw_tasks = resp["body"]
