@@ -369,19 +369,23 @@ class IronWorker:
     #############################################################
     ########################## TASKS ############################
     #############################################################
-    def tasks(self, scheduled=False):
-        tasks = []
+    def tasks(self, scheduled=False, page=None, per_page=30):
         if not scheduled:
             resp = self.client.get("tasks")
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["tasks"]
         else:
-            resp = self.client.get("schedules")
+            if per_page > 100:
+                raise Exception("The limit for per_page is 100")
+            query_params = "?per_page=" + str(per_page)
+            if page is not None:
+                query_params += "&page=" + page
+            request_string = "schedules" + query_params
+            resp = self.client.get(request_string)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["schedules"]
 
-        for raw_task in raw_tasks:
-            tasks.append(Task(raw_task))
+        tasks = [Task(raw_task) for raw_task in raw_tasks]
         return tasks
 
     def tasks_by_code_name(self, code_name):
