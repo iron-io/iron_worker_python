@@ -238,7 +238,7 @@ class CodePackage:
 
 class IronWorker:
     NAME = "iron_worker_python"
-    VERSION = "1.3.3"
+    VERSION = "1.3.4"
     
     isLoaded = False
     arguments = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
