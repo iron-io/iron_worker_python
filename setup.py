@@ -9,7 +9,7 @@ setup(
         name='iron-worker',
         py_modules=["iron_worker"],
 	packages=["testDir"],
-        version='1.3.3',
+        version='1.3.4',
         install_requires=["iron_core >= 1.1.0", "python-dateutil"],
         description='The Python client for IronWorker, a cloud service for background processing.',
         author='Iron.io',
