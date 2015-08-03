@@ -129,7 +129,7 @@ class TestIronWorker(unittest.TestCase):
         resp = self.worker.queue(
                 code_name=self.code_name,
                 payload={"schedule": "AWESOME SCHEDULE!"},
-                start_at=start_at, run_every=3600, run_times=8)
+                start_at=start_at, run_every=3600, run_times=8, timeout=120)
 
         schedules = self.worker.tasks(scheduled=True)
         schedule_ids = []

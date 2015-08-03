@@ -440,6 +440,8 @@ class IronWorker:
                         task.start_at = task.start_at.replace(tzinfo=tzlocal())
                     task_data["start_at"] = iron_core.IronClient.toRfc3339(
                             task.start_at)
+                if task.timeout is not None:
+                    task_data["timeout"] = task.timeout
                 task_data["label"] = task.label
                 task_data["cluster"] = task.cluster
             tasks_data.append(task_data)
