@@ -393,7 +393,7 @@ class IronWorker:
         resp = self.client.get("tasks?code_name=%s" % code_name)
         raw_tasks = resp["body"]["tasks"]
         for raw_task in raw_tasks:
-           tasks.append(Task(raw_task))
+            tasks.append(Task(raw_task))
         return tasks
 
     def queue(self, task=None, tasks=None, retry=None, **kwargs):
