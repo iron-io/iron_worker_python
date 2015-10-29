@@ -579,8 +579,8 @@ class IronWorker:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['payload'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker payload into json, leaving as string. %s" % e)
 
         if 'config_file' in IronWorker.arguments and file_exists(IronWorker.arguments['config_file']):
             f = open(IronWorker.arguments['config_file'])
@@ -588,8 +588,8 @@ class IronWorker:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['config'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker config into json. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker config into json. %s" % e)
 
         IronWorker.isLoaded = True
 
