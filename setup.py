@@ -8,7 +8,7 @@ if sys.version_info >= (3,):
 setup(
         name='iron-worker',
         py_modules=["iron_worker"],
-	packages=["testDir"],
+        packages=["testDir"],
         version='1.3.5',
         install_requires=["iron_core >= 1.1.0", "python-dateutil"],
         description='The Python client for IronWorker, a cloud service for background processing.',

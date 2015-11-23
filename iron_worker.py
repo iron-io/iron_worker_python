@@ -481,27 +481,27 @@ class IronWorker:
         headers = {"Accept": "text/plain"}
         resp = self.client.get(url, headers=headers)
         return resp["body"]
-	
+        
     def setProgress(self, id, percent, msg=''):
         if isinstance(id, Task):
             id = id.id
         url = "tasks/%s/progress" % id
-	body = {}
-	body['percent'] = percent
-	body['msg'] = msg
+        body = {}
+        body['percent'] = percent
+        body['msg'] = msg
         body = json.dumps(body)
-	resp = self.client.post(url, body=body,
+        resp = self.client.post(url, body=body,
                                     headers={"Content-Type":"application/json"})
         return resp["body"]
-		
+                
     def retry(self, id, delay=1):
         if isinstance(id, Task):
             id = id.id
         url = "tasks/%s/retry" % id
-	body = {}
+        body = {}
         body['delay'] = delay
         body = json.dumps(body)
-	resp = self.client.post(url, body=body,
+        resp = self.client.post(url, body=body,
                                     headers={"Content-Type":"application/json"})
         return resp["body"]
 
@@ -574,7 +574,7 @@ class IronWorker:
         if os.getenv('CONFIG_FILE'): IronWorker.arguments['config_file'] = os.getenv('CONFIG_FILE')
 
         if 'payload_file' in IronWorker.arguments and file_exists(IronWorker.arguments['payload_file']):
-	    f = open(IronWorker.arguments['payload_file'], "r")
+            f = open(IronWorker.arguments['payload_file'], "r")
             try:
                 content = f.read()
                 f.close()
