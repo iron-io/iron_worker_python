@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 import sys
 if sys.version_info >= (3,):
@@ -239,7 +241,7 @@ class CodePackage:
 class IronWorker:
     NAME = "iron_worker_python"
     VERSION = "1.3.5"
-    
+
     isLoaded = False
     arguments = {'task_id': None, 'dir': None, 'payload': None, 'config': None}
 
@@ -249,7 +251,7 @@ class IronWorker:
         Keyword arguments are passed directly to iron_core_python; consult its
         documentation for a full list and possible values."""
         self.client = iron_core.IronClient(name=IronWorker.NAME,
-                version=IronWorker.VERSION, product="iron_worker", **kwargs)    
+                version=IronWorker.VERSION, product="iron_worker", **kwargs)
 
     #############################################################
     ####################### CODE PACKAGES #######################
@@ -447,7 +449,7 @@ class IronWorker:
             tasks_data.append(task_data)
         data = json.dumps({type_str: tasks_data})
         headers = {"Content-Type": "application/json"}
-        
+
         if retry is not None:
             resp = self.client.post(type_str, body=data, headers=headers, retry=retry)
         else:
@@ -458,7 +460,7 @@ class IronWorker:
                     for task in tasks[type_str]]
         else:
             return Task(tasks[type_str][0],
-                    scheduled=(type_str == "schedules"))
+                        scheduled=(type_str == "schedules"))
 
     def task(self, id, scheduled=False):
         if isinstance(id, Task):
@@ -481,28 +483,28 @@ class IronWorker:
         headers = {"Accept": "text/plain"}
         resp = self.client.get(url, headers=headers)
         return resp["body"]
-	
+
     def setProgress(self, id, percent, msg=''):
         if isinstance(id, Task):
             id = id.id
         url = "tasks/%s/progress" % id
-	body = {}
-	body['percent'] = percent
-	body['msg'] = msg
+        body = {}
+        body['percent'] = percent
+        body['msg'] = msg
         body = json.dumps(body)
-	resp = self.client.post(url, body=body,
-                                    headers={"Content-Type":"application/json"})
+        resp = self.client.post(url, body=body,
+                                headers={"Content-Type": "application/json"})
         return resp["body"]
-		
+
     def retry(self, id, delay=1):
         if isinstance(id, Task):
             id = id.id
         url = "tasks/%s/retry" % id
-	body = {}
+        body = {}
         body['delay'] = delay
         body = json.dumps(body)
-	resp = self.client.post(url, body=body,
-                                    headers={"Content-Type":"application/json"})
+        resp = self.client.post(url, body=body,
+                                headers={"Content-Type":"application/json"})
         return resp["body"]
 
     def cancel(self, id, scheduled=False):
@@ -567,20 +569,20 @@ class IronWorker:
                 IronWorker.arguments['payload_file'] = sys.argv[i + 1]
             if sys.argv[i] == "-config":
                 IronWorker.arguments['config_file'] = sys.argv[i + 1]
-        
+
         if os.getenv('TASK_ID'): IronWorker.arguments['task_id'] = os.getenv('TASK_ID')
         if os.getenv('TASK_DIR'): IronWorker.arguments['dir'] = os.getenv('TASK_DIR')
         if os.getenv('PAYLOAD_FILE'): IronWorker.arguments['payload_file'] = os.getenv('PAYLOAD_FILE')
         if os.getenv('CONFIG_FILE'): IronWorker.arguments['config_file'] = os.getenv('CONFIG_FILE')
 
         if 'payload_file' in IronWorker.arguments and file_exists(IronWorker.arguments['payload_file']):
-	    f = open(IronWorker.arguments['payload_file'], "r")
+            f = open(IronWorker.arguments['payload_file'], "r")
             try:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['payload'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker payload into json, leaving as string. %s" % e)
 
         if 'config_file' in IronWorker.arguments and file_exists(IronWorker.arguments['config_file']):
             f = open(IronWorker.arguments['config_file'])
@@ -588,8 +590,8 @@ class IronWorker:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['config'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker config into json. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker config into json. %s" % e)
 
         IronWorker.isLoaded = True
 
@@ -597,7 +599,7 @@ class IronWorker:
     def payload():
         IronWorker.load_args()
         return IronWorker.arguments['payload']
-    
+
     @staticmethod
     def config():
         IronWorker.load_args()
