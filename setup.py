@@ -8,7 +8,7 @@ if sys.version_info >= (3,):
 setup(
         name='iron-worker',
         py_modules=["iron_worker"],
-	packages=["testDir"],
+        packages=["testDir"],
         version='1.3.5',
         install_requires=["iron_core >= 1.1.0", "python-dateutil"],
         description='The Python client for IronWorker, a cloud service for background processing.',
@@ -32,13 +32,13 @@ setup(
         long_description="""IronWorker Python Library
 -------------------------
 
-This package offers a client interface to the Iron.io IronWorker service. It 
-offers a full, native interface to the IronWorker API, including creating 
-and uploading code package, queuing and scheduling tasks, viewing task logs, 
+This package offers a client interface to the Iron.io IronWorker service. It
+offers a full, native interface to the IronWorker API, including creating
+and uploading code package, queuing and scheduling tasks, viewing task logs,
 and more.
 
-IronWorker is a background processing and task queuing system that lets your 
-applications use the cloud to do their heavy lifting. Find out more at 
+IronWorker is a background processing and task queuing system that lets your
+applications use the cloud to do their heavy lifting. Find out more at
 http://www.iron.io/products/worker.""",
         **python3_setup
 )
