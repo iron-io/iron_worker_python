@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 import sys
 if sys.version_info >= (3,):
@@ -458,7 +460,7 @@ class IronWorker:
                     for task in tasks[type_str]]
         else:
             return Task(tasks[type_str][0],
-                    scheduled=(type_str == "schedules"))
+                        scheduled=(type_str == "schedules"))
 
     def task(self, id, scheduled=False):
         if isinstance(id, Task):
@@ -491,7 +493,7 @@ class IronWorker:
         body['msg'] = msg
         body = json.dumps(body)
         resp = self.client.post(url, body=body,
-                                    headers={"Content-Type":"application/json"})
+                                headers={"Content-Type": "application/json"})
         return resp["body"]
 
     def retry(self, id, delay=1):
@@ -502,7 +504,7 @@ class IronWorker:
         body['delay'] = delay
         body = json.dumps(body)
         resp = self.client.post(url, body=body,
-                                    headers={"Content-Type":"application/json"})
+                                headers={"Content-Type":"application/json"})
         return resp["body"]
 
     def cancel(self, id, scheduled=False):
@@ -579,8 +581,8 @@ class IronWorker:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['payload'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker payload into json, leaving as string. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker payload into json, leaving as string. %s" % e)
 
         if 'config_file' in IronWorker.arguments and file_exists(IronWorker.arguments['config_file']):
             f = open(IronWorker.arguments['config_file'])
@@ -588,8 +590,8 @@ class IronWorker:
                 content = f.read()
                 f.close()
                 IronWorker.arguments['config'] = json.loads(content)
-            except Exception, e:
-                print "Couldn't parse IronWorker config into json. %s" % e
+            except Exception as e:
+                print("Couldn't parse IronWorker config into json. %s" % e)
 
         IronWorker.isLoaded = True
 
