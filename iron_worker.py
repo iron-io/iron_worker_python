@@ -371,18 +371,48 @@ class IronWorker:
     #############################################################
     ########################## TASKS ############################
     #############################################################
-    def tasks(self, scheduled=False, page=None, per_page=30):
+    def tasks(self, scheduled=False, page=None, per_page=30, **kwargs):
+        query_params = []
+
+        if page:
+            query_params.append("page=%s" % page)
+
+        if per_page > 100:
+            raise Exception("The limit for per_page is 100")
+
+        elif per_page:
+            query_params.append('per_page=%s' % per_page)
+
         if not scheduled:
-            resp = self.client.get("tasks")
+            if 'queued' in kwargs:
+                query_params.append('queued=1')
+
+            if 'running' in kwargs:
+                query_params.append('running=1')
+
+            if 'complete' in kwargs:
+                query_params.append('complete=1')
+
+            if 'error' in kwargs:
+                query_params.append('error=1')
+
+            if 'cancelled' in kwargs:
+                query_params('cancelled=1')
+
+            if 'killed' in kwargs:
+                query_params('killed=1')
+
+            if 'timeout' in kwargs:
+                query_params('timeout=1')
+
+            query_params = "&".join(query_params)
+            request_string = "tasks?" + query_params
+            resp = self.client.get(request_string)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["tasks"]
         else:
-            if per_page > 100:
-                raise Exception("The limit for per_page is 100")
-            query_params = "?per_page=" + str(per_page)
-            if page is not None:
-                query_params += "&page=" + page
-            request_string = "schedules" + query_params
+            query_params = "&".join(query_params)
+            request_string = "schedules?" + query_params
             resp = self.client.get(request_string)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["schedules"]
