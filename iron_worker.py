@@ -397,13 +397,25 @@ class IronWorker:
                 query_params.append('error=1')
 
             if 'cancelled' in kwargs:
-                query_params('cancelled=1')
+                query_params.append('cancelled=1')
 
             if 'killed' in kwargs:
-                query_params('killed=1')
+                query_params.append('killed=1')
 
             if 'timeout' in kwargs:
-                query_params('timeout=1')
+                query_params.append('timeout=1')
+
+            if 'from_time' in kwargs:
+                if not (isinstance(kwargs['from_time'], int)):
+                    raise Exception('The time should be epoch integer seconds')
+
+                query_params.append('from_time=%s' % kwargs['from_time'])
+
+            if 'to_time' in kwargs:
+                if not (isinstance(kwargs['to_time'], int)):
+                    raise Exception('The time should be epoch integer seconds')
+
+                query_params.append('to_time=%s' % kwargs['to_time'])
 
             query_params = "&".join(query_params)
             request_string = "tasks?" + query_params
