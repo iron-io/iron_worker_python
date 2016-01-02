@@ -381,7 +381,7 @@ class IronWorker:
                 raise Exception("The limit for per_page is 100")
             query_params = "?per_page=" + str(per_page)
             if page is not None:
-                query_params += "&page=" + page
+                query_params += "&page=" + str(page)
             request_string = "schedules" + query_params
             resp = self.client.get(request_string)
             raw_tasks = resp["body"]
