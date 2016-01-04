@@ -371,18 +371,60 @@ class IronWorker:
     #############################################################
     ########################## TASKS ############################
     #############################################################
-    def tasks(self, scheduled=False, page=None, per_page=30):
+    def tasks(self, scheduled=False, page=None, per_page=30, **kwargs):
+        query_params = []
+
+        if page:
+            query_params.append("page=%s" % page)
+
+        if per_page > 100:
+            raise Exception("The limit for per_page is 100")
+
+        elif per_page:
+            query_params.append('per_page=%s' % per_page)
+
         if not scheduled:
-            resp = self.client.get("tasks")
+            if 'queued' in kwargs:
+                query_params.append('queued=1')
+
+            if 'running' in kwargs:
+                query_params.append('running=1')
+
+            if 'complete' in kwargs:
+                query_params.append('complete=1')
+
+            if 'error' in kwargs:
+                query_params.append('error=1')
+
+            if 'cancelled' in kwargs:
+                query_params.append('cancelled=1')
+
+            if 'killed' in kwargs:
+                query_params.append('killed=1')
+
+            if 'timeout' in kwargs:
+                query_params.append('timeout=1')
+
+            if 'from_time' in kwargs:
+                if not (isinstance(kwargs['from_time'], int)):
+                    raise Exception('The time should be epoch integer seconds')
+
+                query_params.append('from_time=%s' % kwargs['from_time'])
+
+            if 'to_time' in kwargs:
+                if not (isinstance(kwargs['to_time'], int)):
+                    raise Exception('The time should be epoch integer seconds')
+
+                query_params.append('to_time=%s' % kwargs['to_time'])
+
+            query_params = "&".join(query_params)
+            request_string = "tasks?" + query_params
+            resp = self.client.get(request_string)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["tasks"]
         else:
-            if per_page > 100:
-                raise Exception("The limit for per_page is 100")
-            query_params = "?per_page=" + str(per_page)
-            if page is not None:
-                query_params += "&page=" + page
-            request_string = "schedules" + query_params
+            query_params = "&".join(query_params)
+            request_string = "schedules?" + query_params
             resp = self.client.get(request_string)
             raw_tasks = resp["body"]
             raw_tasks = raw_tasks["schedules"]
