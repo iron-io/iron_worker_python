@@ -417,6 +417,9 @@ class IronWorker:
 
                 query_params.append('to_time=%s' % kwargs['to_time'])
 
+            if 'code_name' in kwargs:
+                query_params.append('code_name=%s' % kwargs['code_name'])
+
             query_params = "&".join(query_params)
             request_string = "tasks?" + query_params
             resp = self.client.get(request_string)
