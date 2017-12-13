@@ -6,6 +6,7 @@ if sys.version_info >= (3,):
     import http.client
 else:
     import httplib
+from requests.exceptions import HTTPError
 import mimetypes
 import zipfile
 import time
@@ -57,6 +58,7 @@ class Task:
     priority = 0
     label = None
     cluster = None
+    sync = False
 
     scheduled = False
     repeating = False
@@ -466,7 +468,8 @@ class IronWorker:
                     "priority": task.priority,
                     "delay": task.delay,
                     "label": task.label,
-                    "cluster": task.cluster
+                    "cluster": task.cluster,
+                    "sync": task.sync
             }
             if not task.scheduled:
                 type_str = "tasks"
@@ -529,6 +532,16 @@ class IronWorker:
         resp = self.client.get(url, headers=headers)
         return resp["body"]
 
+    def stdout(self, id):
+        if isinstance(id, Task):
+            if id.scheduled:
+                raise ValueError("Cannot retrieve a scheduled task's stdout.")
+            id = id.id
+        url = "tasks/%s/outlog" % id
+        headers = {"Accept": "text/plain"}
+        resp = self.client.get(url, headers=headers)
+        return resp["body"]
+
     def setProgress(self, id, percent, msg=''):
         if isinstance(id, Task):
             id = id.id
@@ -562,6 +575,34 @@ class IronWorker:
             url = "schedules/%s/cancel" % id
         resp = self.client.post(url)
         return True
+
+    def run(self, **kwargs):
+        kwargs['sync'] = True
+        task = self.queue(**kwargs)
+
+        task = self.wait_for_task(task)
+
+        return self.wait_for_task_stdout(task)
+
+    def wait_for_task(self, task):
+        sleep = 0.5
+        task = self.task(task)
+        tries = task.timeout + 15
+        while task.status in ['queued', 'preparing', 'running']:
+            tries -= 1
+            if tries < 0:
+                raise RuntimeError('Timeout waiting for task execution')
+            time.sleep(sleep)
+            sleep = IronWorker.sleep_between_retries(sleep)
+            task = self.task(task)
+        return task
+
+    def wait_for_task_log(self, task):
+        return IronWorker.wait_for_task_output(task, self.log)
+
+    def wait_for_task_stdout(self, task):
+        return IronWorker.wait_for_task_output(task, self.stdout)
+
 
     #############################################################
     ######################### HELPERS ###########################
@@ -668,3 +709,26 @@ class IronWorker:
     @staticmethod
     def loaded():
         return IronWorker.isLoaded
+
+    @staticmethod
+    def sleep_between_retries(previous_duration):
+        if previous_duration >= 60:
+            return previous_duration
+        return previous_duration * 2
+
+    @staticmethod
+    def wait_for_task_output(task, out_func):
+        sleep = 0.5
+        tries = 60
+        while True:
+            try:
+                return out_func(task)
+            except HTTPError as e:
+                if e.response.status_code == 404:
+                    tries -= 1
+                    if tries < 0:
+                        raise RuntimeError('Timeout waiting for task output')
+                    time.sleep(sleep)
+                    sleep = IronWorker.sleep_between_retries(sleep)
+                else:
+                    raise e
