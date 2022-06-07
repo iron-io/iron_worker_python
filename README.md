@@ -59,7 +59,7 @@ print "Hello Python World!\n"
 ## Upload code to IronWorker
 
 
-See here for how to build a Java worker and upload it to Iron.io: https://github.com/iron-io/dockerworker/tree/master/python
+See here for how to build a Python worker and upload it to Iron.io: https://github.com/iron-io/dockerworker/tree/master/python
 ## Queueing a Task
 
 To run your code, you need to queue a task against it.
