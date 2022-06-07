@@ -58,29 +58,8 @@ print "Hello Python World!\n"
 
 ## Upload code to IronWorker
 
-### Get the `iron_worker_ng` Gem
 
-[Iron.io](http://www.iron.io) has a [command line interface](http://dev.iron.io/worker/reference/cli) to the IronWorker service that makes working with the service a lot easier and more convenient. It does, however, require you to have Ruby 1.9+ installed and to install the `iron_worker_ng` gem. Once Ruby 1.9+ is installed, you can just run the following command to get the gem:
-
-```bash
-$ gem install iron_worker_ng
-```
-
-### Create Your .worker File
-
-.worker files are a simple way to define your worker and its dependencies. Save the following in a file called `HelloWorld.worker`:
-
-```ruby
-# set the runtime language; this should be "python" for Python workers
-runtime "python"
-# exec is the file that will be executed when you queue a task
-exec "hello.py"
-```
-
-### Upload the Worker
-
-Once you have your configuration file, your .worker file, and the gem in place, you can run `iron_worker upload HelloWorld` (if your .worker file is named HelloWorld.worker) to upload your worker.
-
+See here for how to build a Python worker and upload it to Iron.io: https://github.com/iron-io/dockerworker/tree/master/python
 ## Queueing a Task
 
 To run your code, you need to queue a task against it.
